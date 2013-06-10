@@ -1,8 +1,10 @@
-package com.gmail.leonidandand.puzzlesstudy.utils;
+package com.gmail.leonidandand.puzzlesstudy.utils.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+
+import com.gmail.leonidandand.puzzlesstudy.utils.Matrix;
 
 
 public class Test_Matrix_Position {

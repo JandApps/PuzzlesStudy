@@ -1,4 +1,4 @@
-package com.gmail.leonidandand.puzzlesstudy.utils;
+package com.gmail.leonidandand.puzzlesstudy.utils.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -7,6 +7,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.gmail.leonidandand.puzzlesstudy.utils.Matrix;
 
 public class TestMatrix {
 
