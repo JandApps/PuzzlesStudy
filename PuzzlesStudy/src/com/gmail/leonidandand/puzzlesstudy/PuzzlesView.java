@@ -54,10 +54,15 @@ public class PuzzlesView extends View {
 	}
 	
 	public void setBitmap(Bitmap bitmap, Dimension dim) {
-		this.dim = dim;
+		setDimension(dim);
 		setBitmap(bitmap);
 	}
 	
+	private void setDimension(Dimension dim) {
+		this.dim = dim;
+		puzzles = new Matrix<Bitmap>(dim);
+	}
+
 	public void setBitmap(Bitmap bitmap) {
 		calculateSizes();
 		this.fullImage = scaleBitmap(bitmap);
@@ -84,12 +89,12 @@ public class PuzzlesView extends View {
 		puzzles.forEach(new Matrix.OnEachHandler<Bitmap>() {
 			@Override
 			public void handle(Matrix<Bitmap> matrix, Position pos) {
-				matrix.set(pos, puzzleAtPosition(pos));
+				matrix.set(pos, puzzleByPosition(pos));
 			}
 		});
 	}
 	
-	private Bitmap puzzleAtPosition(Matrix.Position pos) {
+	private Bitmap puzzleByPosition(Matrix.Position pos) {
 		int x = pos.column * puzzleSize.width;
 		int y = pos.row * puzzleSize.height;
 		return Bitmap.createBitmap(fullImage, x, y, puzzleSize.width, puzzleSize.height);

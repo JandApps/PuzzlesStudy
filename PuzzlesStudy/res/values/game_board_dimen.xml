@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="easy_rows">3</integer>
+    <integer name="easy_columns">2</integer>
+    <integer name="medium_rows">6</integer>
+    <integer name="medium_columns">4</integer>
+    <integer name="hard_rows">9</integer>
+    <integer name="hard_columns">6</integer>
+</resources>
