@@ -7,9 +7,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.LightingColorFilter;
-import android.graphics.Paint;
 import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -39,6 +36,7 @@ public class PuzzlesView extends View {
 
 	public PuzzlesView(Context context) {
 		super(context);
+		setBackgroundColor(Color.BLACK);
 	}
 
 	public PuzzlesView(Context context, AttributeSet attrs) {
@@ -221,13 +219,5 @@ public class PuzzlesView extends View {
 		for (OnGameFinishedListener each : onGameFinishedListeners) {
 			each.onGameFinished();
 		}
-	}
-
-	@SuppressWarnings("unused")
-	private Paint colorFilterPaint() {
-		Paint p = new Paint(Color.BLUE);
-		ColorFilter filter = new LightingColorFilter(Color.argb(120, 20, 60, 250), 1);
-		p.setColorFilter(filter);
-		return p;
 	}
 }
