@@ -7,6 +7,8 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 
+import com.gmail.leonidandand.puzzlesstudy.utils.Matrix.Position;
+
 import android.annotation.SuppressLint;
 
 public class TestMatrix {
@@ -76,6 +78,32 @@ public class TestMatrix {
 	@Test(expected=IndexOutOfBoundsException.class)
 	public void testGetOutOfBoundsArguments() {
 		new Matrix<Integer>(6, 1).get(0, 3);
+	}
+
+	@Test
+	public void testSwap() {
+		Matrix<Integer> matrix = new Matrix<Integer>(2, 2);
+		Matrix.Position pos1 = new Matrix.Position(0, 0);
+		Matrix.Position pos2 = new Matrix.Position(1, 1);
+		matrix.set(pos1, new Integer(2));
+		matrix.set(pos2, new Integer(1));
+		matrix.swap(pos1, pos2);
+		assertEquals(new Integer(2), matrix.get(pos2));
+		assertEquals(new Integer(1), matrix.get(pos1));
+	}
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testSwapIllegalArguments() {
+		Matrix.Position pos1 = new Matrix.Position(0, 0);
+		Matrix.Position pos2 = new Matrix.Position(0, -1);
+		new Matrix<Integer>(2, 2).swap(pos1, pos2);
+	}
+
+	@Test(expected=IndexOutOfBoundsException.class)
+	public void testSwapPositionOutOfBounds() {
+		Matrix.Position pos1 = new Matrix.Position(0, 3);
+		Matrix.Position pos2 = new Matrix.Position(0, 0);
+		new Matrix<Integer>(2, 2).swap(pos1, pos2);
 	}
 
 	@Test

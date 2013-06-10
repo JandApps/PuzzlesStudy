@@ -1,5 +1,8 @@
 package com.gmail.leonidandand.puzzlesstudy;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -11,24 +14,26 @@ import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Toast;
 
 import com.gmail.leonidandand.puzzlesstudy.utils.Dimension;
 import com.gmail.leonidandand.puzzlesstudy.utils.Matrix;
 import com.gmail.leonidandand.puzzlesstudy.utils.Size;
 
 public class PuzzlesView extends View {
-
-	private final int LATTICE_WIDTH = 1;
-	private Dimension dim = new Dimension(6, 4);
+	private static final Dimension DEFAULT_DIMENSION = new Dimension(6, 4);
+	private static final int LATTICE_WIDTH = 1;
+	
+	private Dimension dim = DEFAULT_DIMENSION;
 	private Matrix<Bitmap> puzzles = new Matrix<Bitmap>(dim);
-	private GameArbitrator arbitrator;
-	private Bitmap fullImage = null;
 	private Mixer mixer = new Mixer();
+	private Bitmap fullImage = null;
+	private Collection<OnGameFinishedListener> onGameFinishedListeners =
+								new ArrayList<OnGameFinishedListener>();
+	private GameArbitrator arbitrator;
 	private Size puzzleSize;
-	private Point lastTouchPoint;
-	private Point touchedLeftUpper;
-	private Matrix.Position touchedPos;
+	private Point lastTouchedPoint;
+	private Point draggedLeftUpper;
+	private Matrix.Position draggedPosition;
 
 	public PuzzlesView(Context context) {
 		super(context);
@@ -37,10 +42,13 @@ public class PuzzlesView extends View {
 	public PuzzlesView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 	}
-	
 
 	public PuzzlesView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+	}
+	
+	public void addOnGameFinishedListener(OnGameFinishedListener listener) {
+		onGameFinishedListeners.add(listener);
 	}
 	
 	public void setBitmap(Bitmap bitmap, Dimension dim) {
@@ -54,7 +62,7 @@ public class PuzzlesView extends View {
 		cutIntoPuzzles();
 		arbitrator = new GameArbitrator(puzzles);
 		mixer.mix(puzzles);
-		untouch();
+		draggingStopped();
 		invalidate();
 	}
 
@@ -85,8 +93,12 @@ public class PuzzlesView extends View {
 		return Bitmap.createBitmap(fullImage, x, y, puzzleSize.width, puzzleSize.height);
 	}
 
-	private void untouch() {
-		touchedPos = null;
+	private void draggingStopped() {
+		draggedPosition = null;
+	}
+
+	private boolean existDraggedPuzzle() {
+		return draggedPosition != null;
 	}
 
 	@Override
@@ -99,24 +111,20 @@ public class PuzzlesView extends View {
 	private void drawPuzzles(Canvas canvas) {
 		for (int row = 0; row < dim.rows; ++row) {
 			for (int column = 0; column < dim.columns; ++column) {
-				if (!existTouchedPuzzle() || !touchedPuzzlePosition(row, column)) {
+				if (!existDraggedPuzzle() || !draggedPuzzlePosition(row, column)) {
 					Point leftUpper = leftUpperOfPuzzle(row, column);
 					canvas.drawBitmap(puzzles.get(row, column), leftUpper.x, leftUpper.y, null);
 				}
 			}
 		}
-		if (existTouchedPuzzle()) {
-			Bitmap touchedPuzzle = puzzles.get(touchedPos.row, touchedPos.column);
-			canvas.drawBitmap(touchedPuzzle, touchedLeftUpper.x, touchedLeftUpper.y, null);
+		if (existDraggedPuzzle()) {
+			Bitmap draggedPuzzle = puzzles.get(draggedPosition);
+			canvas.drawBitmap(draggedPuzzle, draggedLeftUpper.x, draggedLeftUpper.y, null);
 		}
 	}
 
-	private boolean existTouchedPuzzle() {
-		return touchedPos != null;
-	}
-
-	private boolean touchedPuzzlePosition(int row, int column) {
-		return (row == touchedPos.row) && (column == touchedPos.column);
+	private boolean draggedPuzzlePosition(int row, int column) {
+		return (row == draggedPosition.row) && (column == draggedPosition.column);
 	}
 	
 	private Point leftUpperOfPuzzle(int row, int column) {
@@ -127,81 +135,90 @@ public class PuzzlesView extends View {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
+		if (fullImage == null) {
+			return false;
+		}
+		
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
-			onDownTouch(event);
+			onDownTouch(eventPoint(event));
 			break;
 			
 		case MotionEvent.ACTION_MOVE:
-			onMoveTouch(event);
+			onMoveTouch(eventPoint(event));
 			break;
 			
 		case MotionEvent.ACTION_UP:
-			onUpTouch(event);
+			onUpTouch(eventPoint(event));
+			break;
 		}
 		return true;
 	}
-
-	private void onDownTouch(MotionEvent event) {
+	
+	private Point eventPoint(MotionEvent event) {
 		int x = (int) event.getX();
 		int y = (int) event.getY();
-		int column = x / (puzzleSize.width + LATTICE_WIDTH);
-		int row = y / (puzzleSize.height + LATTICE_WIDTH);
-		if (insideGameBoard(row, column) && insidePuzzle(x, y)) {
-			lastTouchPoint = new Point(x, y);
-			touchedLeftUpper = leftUpperOfPuzzle(row, column);
-			touchedPos = new Matrix.Position(row, column);
+		return new Point(x, y);
+	}
+
+	private void onDownTouch(Point pt) {
+		Matrix.Position pos = positionByPoint(pt);
+		if (insideGameBoard(pos) && insidePuzzle(pt)) {
+			lastTouchedPoint = pt;
+			draggedLeftUpper = leftUpperOfPuzzle(pos);
+			draggedPosition = pos;
 		}
 	}
 	
-	private boolean insideGameBoard(int row, int column) {
-		return (row < dim.rows) && (column < dim.columns);
+	private Point leftUpperOfPuzzle(Matrix.Position pos) {
+		return leftUpperOfPuzzle(pos.row, pos.column);
+	}
+	
+	private Matrix.Position positionByPoint(Point pt) {
+		int column = pt.x / (puzzleSize.width + LATTICE_WIDTH);
+		int row = pt.y / (puzzleSize.height + LATTICE_WIDTH);
+		return new Matrix.Position(row, column);
+	}
+	
+	private boolean insideGameBoard(Matrix.Position pos) {
+		return (pos.row < dim.rows) && (pos.column < dim.columns);
 	}
 
-	private boolean insidePuzzle(int x, int y) {
-		return ((x % (puzzleSize.width + LATTICE_WIDTH)) < puzzleSize.width) &&
-			   ((y % (puzzleSize.height + LATTICE_WIDTH)) < puzzleSize.height);
+	private boolean insidePuzzle(Point pt) {
+		return ((pt.x % (puzzleSize.width + LATTICE_WIDTH)) < puzzleSize.width) &&
+			   ((pt.y % (puzzleSize.height + LATTICE_WIDTH)) < puzzleSize.height);
 	}
 
-	private void onMoveTouch(MotionEvent event) {
-		if (existTouchedPuzzle()) {
-			int x = (int) event.getX();
-			int y = (int) event.getY();
-			int dx = x - lastTouchPoint.x;
-			int dy = y - lastTouchPoint.y;
-			touchedLeftUpper = new Point(touchedLeftUpper.x + dx, touchedLeftUpper.y + dy);
-			lastTouchPoint = new Point(x, y);
+	private void onMoveTouch(Point pt) {
+		if (existDraggedPuzzle()) {
+			int dx = pt.x - lastTouchedPoint.x;
+			int dy = pt.y - lastTouchedPoint.y;
+			draggedLeftUpper = new Point(draggedLeftUpper.x + dx, draggedLeftUpper.y + dy);
+			lastTouchedPoint = pt;
 			invalidate();
 		}
 	}
 
-	private void onUpTouch(MotionEvent event) {
-		if (existTouchedPuzzle()) {
-			int x = (int) event.getX();
-			int y = (int) event.getY();
-			int column = x / (puzzleSize.width + LATTICE_WIDTH);
-			int row = y / (puzzleSize.height + LATTICE_WIDTH);
-			if (insideGameBoard(row, column) && insidePuzzle(x, y)) {
-				swapWithTouchedPuzzle(row, column);
+	private void onUpTouch(Point pt) {
+		if (existDraggedPuzzle()) {
+			Matrix.Position pos = positionByPoint(pt);
+			if (insideGameBoard(pos) && insidePuzzle(pt)) {
+				puzzles.swap(pos, draggedPosition);
 				if (arbitrator.gameFinished(puzzles)) {
-					Toast.makeText(getContext(), "Game finished", Toast.LENGTH_SHORT).show();
+					notifyGameFinished();
 				}
 			}
-			untouch();
+			draggingStopped();
 			invalidate();
 		}
 	}
-
-	private void swapWithTouchedPuzzle(int row, int column) {
-		Bitmap temp = puzzles.get(row, column);
-		Bitmap touchedPuzzle = puzzles.get(touchedPos.row, touchedPos.column);
-		puzzles.set(row, column, touchedPuzzle);
-		puzzles.set(touchedPos.row, touchedPos.column, temp);
+		
+	private void notifyGameFinished() {
+		for (OnGameFinishedListener each : onGameFinishedListeners) {
+			each.onGameFinished();
+		}
 	}
-	
-	
-	
-	
+
 	@SuppressWarnings("unused")
 	private Paint colorFilterPaint() {
 		Paint p = new Paint(Color.BLUE);

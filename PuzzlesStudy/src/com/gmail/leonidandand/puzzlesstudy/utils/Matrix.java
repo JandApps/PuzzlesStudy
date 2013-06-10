@@ -1,6 +1,7 @@
 package com.gmail.leonidandand.puzzlesstudy.utils;
 
 
+
 public class Matrix<T> {
 
 	public static class Position {
@@ -45,6 +46,10 @@ public class Matrix<T> {
 		}
 	}
 
+	public void set(Position pos, T value) {
+		set(pos.row, pos.column, value);
+	}
+
 	public void set(int row, int column, T value) {
 		checkIndexes(row, column);
 		values[index(row, column)] = value;
@@ -61,6 +66,10 @@ public class Matrix<T> {
 	
 	private int index(int row, int column) {
 		return row * columns + column;
+	}
+
+	public T get(Position pos) {
+		return get(pos.row, pos.column);
 	}
 
 	public T get(int row, int column) {
@@ -98,6 +107,12 @@ public class Matrix<T> {
 		hashCode += Math.max(hashCode1, hashCode2) / Math.min(hashCode1, hashCode2);
 		return hashCode;
 		
+	}
+
+	public void swap(Position pos1, Position pos2) {
+		T temp = get(pos1);
+		set(pos1, get(pos2));
+		set(pos2, temp);
 	}
 
 }

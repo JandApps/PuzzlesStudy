@@ -5,27 +5,27 @@ import java.util.Random;
 import android.graphics.Bitmap;
 
 import com.gmail.leonidandand.puzzlesstudy.utils.Matrix;
+import com.gmail.leonidandand.puzzlesstudy.utils.Matrix.Position;
 
 public class Mixer {
+	private Random random;
 	
 	public void mix(Matrix<Bitmap> puzzles) {
-		Random r = new Random(System.nanoTime());
+		random = new Random(System.nanoTime());
 
-		for (int i = 0; i < puzzles.rows; ++i) {
-			for (int j = 0; j < puzzles.columns; ++j) {
-				
-				int rowOne = r.nextInt(puzzles.rows);
-				int columnOne = r.nextInt(puzzles.columns);
-
-				int rowTwo = r.nextInt(puzzles.rows);
-				int columnTwo = r.nextInt(puzzles.columns);
-
-				Bitmap puzzleOne = puzzles.get(rowOne, columnOne);
-				Bitmap puzzleTwo = puzzles.get(rowTwo, columnTwo);
-				
-				puzzles.set(rowOne, columnOne, puzzleTwo);
-				puzzles.set(rowTwo, columnTwo, puzzleOne);
-			}
+		int numberOfSwaps = numberOfSwaps(puzzles);
+		for (int i = 0; i < numberOfSwaps; ++i) {
+			puzzles.swap(generateRandomPosition(puzzles), generateRandomPosition(puzzles));
 		}
+	}
+
+	private int numberOfSwaps(Matrix<Bitmap> puzzles) {
+		return puzzles.rows * puzzles.columns * 2;
+	}
+
+	private Position generateRandomPosition(Matrix<Bitmap> puzzles) {
+		int row = random.nextInt(puzzles.rows);
+		int column = random.nextInt(puzzles.columns);
+		return new Position(row, column);
 	}
 }
