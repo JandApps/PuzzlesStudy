@@ -13,12 +13,31 @@ public class TestMatrix {
 
 	@SuppressLint("UseValueOf")
 	@Test
+	// TODO: refactoring
 	public void testMatrix() {
-		Matrix<Integer> matrix = new Matrix<Integer>(2, 1);
-		matrix.set(0, 0, new Integer(1));
-		matrix.set(1, 0, new Integer(2));
-		assertEquals(new Integer(1), matrix.get(0, 0));
-		assertEquals(new Integer(2), matrix.get(1, 0));
+		Matrix<Integer> matrix = new Matrix<Integer>(10, 20);
+		for (int row = 0; row < matrix.rows; ++row) {
+			for (int column = 0; column < matrix.columns; ++column) {
+				matrix.set(row, column, elementForPosition(row, column));
+			}
+		}
+		for (int row = 0; row < matrix.rows; ++row) {
+			for (int column = 0; column < matrix.columns; ++column) {
+				assertEquals(new Integer(elementForPosition(row, column)), matrix.get(row, column));
+			}
+		}
+		Matrix<Integer> copy = new Matrix<Integer>(matrix);
+		assertEquals(matrix.rows, copy.rows);
+		assertEquals(matrix.columns, copy.columns);
+		for (int row = 0; row < copy.rows; ++row) {
+			for (int column = 0; column < copy.columns; ++column) {
+				assertEquals(matrix.get(row, column), copy.get(row, column));
+			}
+		}
+	}
+	
+	private int elementForPosition(int row, int column) {
+		return row * column;
 	}
 
 	@Test

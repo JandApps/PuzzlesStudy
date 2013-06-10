@@ -9,9 +9,9 @@ import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import com.gmail.leonidandand.puzzlesstudy.utils.Dimension;
 import com.gmail.leonidandand.puzzlesstudy.utils.Matrix;
@@ -22,10 +22,10 @@ public class PuzzlesView extends View {
 	private final int LATTICE_WIDTH = 1;
 	private Dimension dim = new Dimension(6, 4);
 	private Matrix<Bitmap> puzzles = new Matrix<Bitmap>(dim);
+	private GameArbitrator arbitrator;
 	private Bitmap fullImage = null;
 	private Mixer mixer = new Mixer();
 	private Size puzzleSize;
-	private Size fullImageSize;
 	private Point lastTouchPoint;
 	private Point touchedLeftUpper;
 	private Matrix.Position touchedPos;
@@ -51,25 +51,42 @@ public class PuzzlesView extends View {
 	public void setBitmap(Bitmap bitmap) {
 		calculateSizes();
 		this.fullImage = scaleBitmap(bitmap);
-		fillPuzzles();
+		cutIntoPuzzles();
+		arbitrator = new GameArbitrator(puzzles);
 		mixer.mix(puzzles);
 		untouch();
 		invalidate();
-	}
-
-	private void untouch() {
-		touchedPos = null;
 	}
 
 	private void calculateSizes() {
 		int width = getWidth() - LATTICE_WIDTH * (dim.columns - 1);
 		int height = getHeight() - LATTICE_WIDTH * (dim.rows - 1);
 		puzzleSize = new Size(width / dim.columns, height / dim.rows);
-		fullImageSize = new Size(puzzleSize.width * dim.columns, puzzleSize.height * dim.rows);
 	}
 	
 	private Bitmap scaleBitmap(Bitmap bitmap) {
-		return Bitmap.createScaledBitmap(bitmap, fullImageSize.width, fullImageSize.height, true);
+		int fullImageWidth = puzzleSize.width * dim.columns;
+		int fullImageHeight = puzzleSize.height * dim.rows;
+		return Bitmap.createScaledBitmap(bitmap, fullImageWidth, fullImageHeight, true);
+	}
+
+	private void cutIntoPuzzles() {
+		for (int row = 0; row < dim.rows; ++row) {
+			for (int column = 0; column < dim.columns; ++column) {
+				Bitmap puzzle = puzzleAtPosition(row, column);
+				puzzles.set(row, column, puzzle);
+			}
+		}
+	}
+	
+	private Bitmap puzzleAtPosition(int row, int column) {
+		int x = column * puzzleSize.width;
+		int y = row * puzzleSize.height;
+		return Bitmap.createBitmap(fullImage, x, y, puzzleSize.width, puzzleSize.height);
+	}
+
+	private void untouch() {
+		touchedPos = null;
 	}
 
 	@Override
@@ -82,9 +99,9 @@ public class PuzzlesView extends View {
 	private void drawPuzzles(Canvas canvas) {
 		for (int row = 0; row < dim.rows; ++row) {
 			for (int column = 0; column < dim.columns; ++column) {
-				if (!touchedPuzzlePosition(row, column)) {
-					Point pt = leftUpperOfPuzzle(row, column);
-					canvas.drawBitmap(puzzles.get(row, column), pt.x, pt.y, null);
+				if (!existTouchedPuzzle() || !touchedPuzzlePosition(row, column)) {
+					Point leftUpper = leftUpperOfPuzzle(row, column);
+					canvas.drawBitmap(puzzles.get(row, column), leftUpper.x, leftUpper.y, null);
 				}
 			}
 		}
@@ -93,38 +110,19 @@ public class PuzzlesView extends View {
 			canvas.drawBitmap(touchedPuzzle, touchedLeftUpper.x, touchedLeftUpper.y, null);
 		}
 	}
+
+	private boolean existTouchedPuzzle() {
+		return touchedPos != null;
+	}
+
+	private boolean touchedPuzzlePosition(int row, int column) {
+		return (row == touchedPos.row) && (column == touchedPos.column);
+	}
 	
 	private Point leftUpperOfPuzzle(int row, int column) {
 		int x = (puzzleSize.width + LATTICE_WIDTH) * column;
 		int y = (puzzleSize.height + LATTICE_WIDTH) * row;
 		return new Point(x, y);
-	}
-
-	private boolean touchedPuzzlePosition(int row, int column) {
-		return existTouchedPuzzle() && (row == touchedPos.row) && (column == touchedPos.column);
-	}
-	
-	@SuppressWarnings("unused")
-	private Paint colorFilterPaint() {
-		Paint p = new Paint(Color.BLUE);
-		ColorFilter filter = new LightingColorFilter(Color.argb(120, 20, 60, 250), 1);
-		p.setColorFilter(filter);
-		return p;
-	}
-
-	private void fillPuzzles() {
-		for (int row = 0; row < dim.rows; ++row) {
-			for (int column = 0; column < dim.columns; ++column) {
-				Bitmap puzzle = puzzle(fullImage, row, column);
-				puzzles.set(row, column, puzzle);
-			}
-		}
-	}
-	
-	private Bitmap puzzle(Bitmap bitmap, int row, int column) {
-		int x = column * puzzleSize.width;
-		int y = row * puzzleSize.height;
-		return Bitmap.createBitmap(bitmap, x, y, puzzleSize.width, puzzleSize.height);
 	}
 
 	@Override
@@ -149,12 +147,15 @@ public class PuzzlesView extends View {
 		int y = (int) event.getY();
 		int column = x / (puzzleSize.width + LATTICE_WIDTH);
 		int row = y / (puzzleSize.height + LATTICE_WIDTH);
-		if (row < dim.rows && column < dim.columns && insidePuzzle(x, y)) {
+		if (insideGameBoard(row, column) && insidePuzzle(x, y)) {
 			lastTouchPoint = new Point(x, y);
 			touchedLeftUpper = leftUpperOfPuzzle(row, column);
 			touchedPos = new Matrix.Position(row, column);
-			Log.d("leonidandand", "row: " + row + "; column: " + column);
 		}
+	}
+	
+	private boolean insideGameBoard(int row, int column) {
+		return (row < dim.rows) && (column < dim.columns);
 	}
 
 	private boolean insidePuzzle(int x, int y) {
@@ -174,18 +175,17 @@ public class PuzzlesView extends View {
 		}
 	}
 
-	private boolean existTouchedPuzzle() {
-		return touchedPos != null;
-	}
-
 	private void onUpTouch(MotionEvent event) {
 		if (existTouchedPuzzle()) {
 			int x = (int) event.getX();
 			int y = (int) event.getY();
 			int column = x / (puzzleSize.width + LATTICE_WIDTH);
 			int row = y / (puzzleSize.height + LATTICE_WIDTH);
-			if (row < dim.rows && column < dim.columns && insidePuzzle(x, y)) {
+			if (insideGameBoard(row, column) && insidePuzzle(x, y)) {
 				swapWithTouchedPuzzle(row, column);
+				if (arbitrator.gameFinished(puzzles)) {
+					Toast.makeText(getContext(), "Game finished", Toast.LENGTH_SHORT).show();
+				}
 			}
 			untouch();
 			invalidate();
@@ -197,5 +197,16 @@ public class PuzzlesView extends View {
 		Bitmap touchedPuzzle = puzzles.get(touchedPos.row, touchedPos.column);
 		puzzles.set(row, column, touchedPuzzle);
 		puzzles.set(touchedPos.row, touchedPos.column, temp);
+	}
+	
+	
+	
+	
+	@SuppressWarnings("unused")
+	private Paint colorFilterPaint() {
+		Paint p = new Paint(Color.BLUE);
+		ColorFilter filter = new LightingColorFilter(Color.argb(120, 20, 60, 250), 1);
+		p.setColorFilter(filter);
+		return p;
 	}
 }

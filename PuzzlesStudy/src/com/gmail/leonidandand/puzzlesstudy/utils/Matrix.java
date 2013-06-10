@@ -1,5 +1,6 @@
 package com.gmail.leonidandand.puzzlesstudy.utils;
 
+
 public class Matrix<T> {
 
 	public static class Position {
@@ -33,6 +34,15 @@ public class Matrix<T> {
 	
 	public Matrix(Dimension dim) {
 		this(dim.rows, dim.columns);
+	}
+	
+	public Matrix(Matrix<T> puzzles) {
+		this(puzzles.rows, puzzles.columns);
+		for (int row = 0; row < this.rows; ++row) {
+			for (int column = 0; column < this.columns; ++column) {
+				set(row, column, puzzles.get(row, column));
+			}
+		}
 	}
 
 	public void set(int row, int column, T value) {
