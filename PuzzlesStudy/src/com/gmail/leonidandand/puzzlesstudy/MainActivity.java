@@ -11,17 +11,18 @@ import android.view.MenuItem;
 
 public class MainActivity extends Activity {
 
+	private final static int[] imageIds = new int[] { R.drawable.cut,
+			R.drawable.google, R.drawable.kote, R.drawable.nature1,
+			R.drawable.nature2, R.drawable.nature3, R.drawable.nature4,
+			R.drawable.nature5, R.drawable.nature6, R.drawable.pesik,
+			R.drawable.pesik_2, R.drawable.woman, R.drawable.woman2,
+			R.drawable.woman5 };
 
-	private final static int[] imageIds = new int[] {
-		R.drawable.woman, R.drawable.woman2, R.drawable.woman3, R.drawable.woman4, R.drawable.woman5,
-		R.drawable.nature1, R.drawable.nature2, R.drawable.nature3, R.drawable.nature4,
-		R.drawable.nature5, R.drawable.nature6
-	};
-	
+	private int currentImageId = 0;
 	private Random random = new Random();
 
 	private PuzzlesView drawer;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -39,12 +40,17 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.showImage:
-			int imageId = imageIds[random.nextInt(imageIds.length)];
-			Bitmap bitmap = BitmapFactory.decodeResource(getResources(), imageId);
+			currentImageId = getRandomImageId();
+			Bitmap bitmap = BitmapFactory.decodeResource(getResources(), imageIds[currentImageId]);
 			drawer.setBitmap(bitmap);
 			break;
 		}
 		return true;
+	}
+
+	public int getRandomImageId() {
+		int nextId = random.nextInt(imageIds.length);
+		return (nextId != currentImageId ? nextId : getRandomImageId());
 	}
 
 }
