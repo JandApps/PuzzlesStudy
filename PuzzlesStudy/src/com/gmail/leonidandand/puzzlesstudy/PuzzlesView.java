@@ -17,6 +17,7 @@ import android.view.View;
 
 import com.gmail.leonidandand.puzzlesstudy.utils.Dimension;
 import com.gmail.leonidandand.puzzlesstudy.utils.Matrix;
+import com.gmail.leonidandand.puzzlesstudy.utils.Matrix.Position;
 import com.gmail.leonidandand.puzzlesstudy.utils.Size;
 
 public class PuzzlesView extends View {
@@ -34,6 +35,7 @@ public class PuzzlesView extends View {
 	private Point lastTouchedPoint;
 	private Point draggedLeftUpper;
 	private Matrix.Position draggedPosition;
+	private Canvas canvas;
 
 	public PuzzlesView(Context context) {
 		super(context);
@@ -79,66 +81,63 @@ public class PuzzlesView extends View {
 	}
 
 	private void cutIntoPuzzles() {
-		for (int row = 0; row < dim.rows; ++row) {
-			for (int column = 0; column < dim.columns; ++column) {
-				Bitmap puzzle = puzzleAtPosition(row, column);
-				puzzles.set(row, column, puzzle);
+		puzzles.forEach(new Matrix.OnEachHandler<Bitmap>() {
+			@Override
+			public void handle(Matrix<Bitmap> matrix, Position pos) {
+				matrix.set(pos, puzzleAtPosition(pos));
 			}
-		}
+		});
 	}
 	
-	private Bitmap puzzleAtPosition(int row, int column) {
-		int x = column * puzzleSize.width;
-		int y = row * puzzleSize.height;
+	private Bitmap puzzleAtPosition(Matrix.Position pos) {
+		int x = pos.column * puzzleSize.width;
+		int y = pos.row * puzzleSize.height;
 		return Bitmap.createBitmap(fullImage, x, y, puzzleSize.width, puzzleSize.height);
-	}
-
-	private void draggingStopped() {
-		draggedPosition = null;
-	}
-
-	private boolean existDraggedPuzzle() {
-		return draggedPosition != null;
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
 		if (fullImage != null) {
-			drawPuzzles(canvas);
+			this.canvas = canvas;
+			drawPuzzles();
 		}
 	}
 	
-	private void drawPuzzles(Canvas canvas) {
-		for (int row = 0; row < dim.rows; ++row) {
-			for (int column = 0; column < dim.columns; ++column) {
-				if (!existDraggedPuzzle() || !draggedPuzzlePosition(row, column)) {
-					Point leftUpper = leftUpperOfPuzzle(row, column);
-					canvas.drawBitmap(puzzles.get(row, column), leftUpper.x, leftUpper.y, null);
+	private void drawPuzzles() {
+		puzzles.forEach(new Matrix.OnEachHandler<Bitmap>() {
+			@Override
+			public void handle(Matrix<Bitmap> matrix, Position pos) {
+				if (!existDraggedPuzzle() || !pos.equals(draggedPosition)) {
+					Point leftUpper = leftUpperOfPuzzle(pos);
+					canvas.drawBitmap(puzzles.get(pos), leftUpper.x, leftUpper.y, null);
 				}
 			}
-		}
+		});
 		if (existDraggedPuzzle()) {
 			Bitmap draggedPuzzle = puzzles.get(draggedPosition);
 			canvas.drawBitmap(draggedPuzzle, draggedLeftUpper.x, draggedLeftUpper.y, null);
 		}
 	}
 
-	private boolean draggedPuzzlePosition(int row, int column) {
-		return (row == draggedPosition.row) && (column == draggedPosition.column);
+	private boolean existDraggedPuzzle() {
+		return draggedPosition != null;
+	}
+
+	private void draggingStopped() {
+		draggedPosition = null;
 	}
 	
-	private Point leftUpperOfPuzzle(int row, int column) {
-		int x = (puzzleSize.width + LATTICE_WIDTH) * column;
-		int y = (puzzleSize.height + LATTICE_WIDTH) * row;
+	private Point leftUpperOfPuzzle(Matrix.Position pos) {
+		int x = (puzzleSize.width + LATTICE_WIDTH) * pos.column;
+		int y = (puzzleSize.height + LATTICE_WIDTH) * pos.row;
 		return new Point(x, y);
 	}
 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		if (fullImage == null) {
+		if (notUploadedImage()) {
 			return false;
 		}
-		
 		switch (event.getAction()) {
 		case MotionEvent.ACTION_DOWN:
 			onDownTouch(eventPoint(event));
@@ -155,6 +154,10 @@ public class PuzzlesView extends View {
 		return true;
 	}
 	
+	private boolean notUploadedImage() {
+		return fullImage == null;
+	}
+
 	private Point eventPoint(MotionEvent event) {
 		int x = (int) event.getX();
 		int y = (int) event.getY();
@@ -163,15 +166,11 @@ public class PuzzlesView extends View {
 
 	private void onDownTouch(Point pt) {
 		Matrix.Position pos = positionByPoint(pt);
-		if (insideGameBoard(pos) && insidePuzzle(pt)) {
+		if (validPuzzlePosition(pos) && insidePuzzle(pt)) {
 			lastTouchedPoint = pt;
-			draggedLeftUpper = leftUpperOfPuzzle(pos);
 			draggedPosition = pos;
+			draggedLeftUpper = leftUpperOfPuzzle(draggedPosition);
 		}
-	}
-	
-	private Point leftUpperOfPuzzle(Matrix.Position pos) {
-		return leftUpperOfPuzzle(pos.row, pos.column);
 	}
 	
 	private Matrix.Position positionByPoint(Point pt) {
@@ -180,7 +179,7 @@ public class PuzzlesView extends View {
 		return new Matrix.Position(row, column);
 	}
 	
-	private boolean insideGameBoard(Matrix.Position pos) {
+	private boolean validPuzzlePosition(Matrix.Position pos) {
 		return (pos.row < dim.rows) && (pos.column < dim.columns);
 	}
 
@@ -202,7 +201,7 @@ public class PuzzlesView extends View {
 	private void onUpTouch(Point pt) {
 		if (existDraggedPuzzle()) {
 			Matrix.Position pos = positionByPoint(pt);
-			if (insideGameBoard(pos) && insidePuzzle(pt)) {
+			if (validPuzzlePosition(pos) && insidePuzzle(pt)) {
 				puzzles.swap(pos, draggedPosition);
 				if (arbitrator.gameFinished(puzzles)) {
 					notifyGameFinished();

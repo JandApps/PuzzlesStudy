@@ -6,7 +6,7 @@ package com.gmail.leonidandand.puzzlesstudy.utils;
 public class Matrix<T> {
 
 	public interface OnEachHandler<T> {
-		void handle(Matrix<T> each, Position pos);
+		void handle(Matrix<T> matrix, Position pos);
 	}
 
 	public static class Position {
@@ -20,6 +20,15 @@ public class Matrix<T> {
 			}
 			this.row = row;
 			this.column = column;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ((obj == null) || !(obj instanceof Matrix.Position)) {
+				return false;
+			}
+			Matrix.Position other = (Matrix.Position) obj;
+			return (this.row == other.row) && (this.column == other.column);
 		}
 
 	}

@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.gmail.leonidandand.puzzlesstudy.utils.Matrix;
+import com.gmail.leonidandand.puzzlesstudy.utils.Matrix.Position;
 
 public class TestMatrix {
 
@@ -27,8 +28,8 @@ public class TestMatrix {
 		fillMatrix(matrix);
 		matrix.forEach(new Matrix.OnEachHandler<Integer>() {
 			@Override
-			public void handle(Matrix<Integer> each, Matrix.Position pos) {
-				assertEquals(elementForPosition(pos), each.get(pos));
+			public void handle(Matrix<Integer> matrix, Matrix.Position pos) {
+				assertEquals(elementForPosition(pos), matrix.get(pos));
 			}
 		});
 	}
@@ -36,10 +37,14 @@ public class TestMatrix {
 	private void fillMatrix(Matrix<Integer> matrix) {
 		matrix.forEach(new Matrix.OnEachHandler<Integer>() {
 			@Override
-			public void handle(Matrix<Integer> each, Matrix.Position pos) {
-				each.set(pos, elementForPosition(pos));
+			public void handle(Matrix<Integer> matrix, Matrix.Position pos) {
+				matrix.set(pos, elementForPosition(pos));
 			}
 		});
+	}
+	
+	private Integer elementForPosition(Matrix.Position pos) {
+		return pos.row * pos.column;
 	}
 	
 	@Test
@@ -50,14 +55,11 @@ public class TestMatrix {
 		assertEquals(matrix.columns, copy.columns);
 		copy.forEach(new Matrix.OnEachHandler<Integer>() {
 			@Override
-			public void handle(Matrix<Integer> each, Matrix.Position pos) {
-				assertEquals(TestMatrix.this.matrix.get(pos), each.get(pos));
+			public void handle(Matrix<Integer> matrix, Matrix.Position pos) {
+				Integer expected = TestMatrix.this.matrix.get(pos);
+				assertEquals(expected, matrix.get(pos));
 			}
 		});
-	}
-	
-	private Integer elementForPosition(Matrix.Position pos) {
-		return pos.row * pos.column;
 	}
 
 	@Test
@@ -127,9 +129,9 @@ public class TestMatrix {
 	@Test
 	public void testEquals() {
 		Matrix<Integer> matrix1 = new Matrix<Integer>(1, 2);
-		Matrix<Integer> matrix2 = new Matrix<Integer>(1, 2);
 		matrix1.set(0, 0, VALUE);
 		matrix1.set(0, 1, VALUE);
+		Matrix<Integer> matrix2 = new Matrix<Integer>(1, 2);
 		matrix2.set(0, 0, VALUE);
 		matrix2.set(0, 1, VALUE);
 		assertTrue(matrix1.equals(matrix2));
@@ -147,14 +149,64 @@ public class TestMatrix {
 		}
 		counts.forEach(new Matrix.OnEachHandler<Integer>() {
 			@Override
-			public void handle(Matrix<Integer> each, Matrix.Position pos) {
-				each.set(pos, each.get(pos) + 1);
+			public void handle(Matrix<Integer> matrix, Matrix.Position pos) {
+				matrix.set(pos, matrix.get(pos) + 1);
 			}
 		});
 		for (int row = 0; row < counts.rows; ++row) {
 			for (int column = 0; column < counts.columns; ++column) {
 				assertTrue(counts.get(row, column) == 1);
 			}
+		}
+	}
+
+	@Test
+	public void testForEachOrder_LeftToRight_UpToDown() {
+		Matrix<Boolean> flags = new Matrix<Boolean>(5, 7);
+		flags.forEach(new Matrix.OnEachHandler<Boolean>() {
+			@Override
+			public void handle(Matrix<Boolean> matrix, Position pos) {
+				matrix.set(pos, false);
+			}
+		});
+		flags.forEach(new Matrix.OnEachHandler<Boolean>() {
+			@Override
+			public void handle(Matrix<Boolean> matrix, Position pos) {
+				assertPreviousElementByPassed(matrix, pos);
+				assertNextElementNotByPassed(matrix, pos);
+				matrix.set(pos, true);
+			}
+		});
+	}
+
+	protected void assertPreviousElementByPassed(Matrix<Boolean> matrix, Position pos) {
+		if (!pos.equals(new Matrix.Position(0, 0))) {
+			Matrix.Position positionBefore = positionBefore(matrix.rows, matrix.columns, pos);
+			assertTrue(matrix.get(positionBefore));
+		}
+	}
+
+	protected void assertNextElementNotByPassed(Matrix<Boolean> matrix, Position pos) {
+		Matrix.Position lastPos = new Matrix.Position(matrix.rows - 1, matrix.columns - 1);
+		if (!pos.equals(lastPos)) {
+			Matrix.Position positionAfter = positionAfter(matrix.rows, matrix.columns, pos);
+			assertFalse(matrix.get(positionAfter));
+		}
+	}
+
+	protected Matrix.Position positionBefore(int rows, int columns, Position pos) {
+		if (pos.column - 1 < 0) {
+			return new Matrix.Position(pos.row - 1, columns - 1);
+		} else {
+			return new Matrix.Position(pos.row, pos.column - 1);
+		}
+	}
+
+	protected Position positionAfter(int rows, int columns, Position pos) {
+		if (pos.column + 1 >= columns) {
+			return new Matrix.Position(pos.row + 1, 0);
+		} else {
+			return new Matrix.Position(pos.row, pos.column + 1);
 		}
 	}
 }
