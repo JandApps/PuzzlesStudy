@@ -9,18 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class TestMatrix {
-	
-	private interface OnEachElementHandler {
-		void handle(Matrix<Integer> each, int row, int column);
-	}
-	
-	private void forEachElementOfMatrix(Matrix<Integer> matrix, OnEachElementHandler handler) {
-		for (int row = 0; row < matrix.rows; ++row) {
-			for (int column = 0; column < matrix.columns; ++column) {
-				handler.handle(matrix, row, column);
-			}
-		}
-	}
 
 	private static final Integer VALUE = 5;
 	private static final int ROWS = 10;
@@ -35,19 +23,19 @@ public class TestMatrix {
 	@Test
 	public void testMatrix() {
 		fillMatrix(matrix);
-		forEachElementOfMatrix(matrix, new OnEachElementHandler() {
+		matrix.forEach(new Matrix.OnEachHandler<Integer>() {
 			@Override
-			public void handle(Matrix<Integer> each, int row, int column) {
-				assertEquals(elementForPosition(row, column), each.get(row, column));
+			public void handle(Matrix<Integer> each, Matrix.Position pos) {
+				assertEquals(elementForPosition(pos), each.get(pos));
 			}
 		});
 	}
 	
 	private void fillMatrix(Matrix<Integer> matrix) {
-		forEachElementOfMatrix(matrix, new OnEachElementHandler() {
+		matrix.forEach(new Matrix.OnEachHandler<Integer>() {
 			@Override
-			public void handle(Matrix<Integer> each, int row, int column) {
-				each.set(row, column, elementForPosition(row, column));
+			public void handle(Matrix<Integer> each, Matrix.Position pos) {
+				each.set(pos, elementForPosition(pos));
 			}
 		});
 	}
@@ -58,17 +46,16 @@ public class TestMatrix {
 		Matrix<Integer> copy = new Matrix<Integer>(matrix);
 		assertEquals(matrix.rows, copy.rows);
 		assertEquals(matrix.columns, copy.columns);
-		forEachElementOfMatrix(copy, new OnEachElementHandler() {
+		copy.forEach(new Matrix.OnEachHandler<Integer>() {
 			@Override
-			public void handle(Matrix<Integer> each, int row, int column) {
-				Integer expected = TestMatrix.this.matrix.get(row, column);
-				assertEquals(expected, each.get(row, column));
+			public void handle(Matrix<Integer> each, Matrix.Position pos) {
+				assertEquals(TestMatrix.this.matrix.get(pos), each.get(pos));
 			}
 		});
 	}
 	
-	private Integer elementForPosition(int row, int column) {
-		return row * column;
+	private Integer elementForPosition(Matrix.Position pos) {
+		return pos.row * pos.column;
 	}
 
 	@Test
@@ -146,5 +133,26 @@ public class TestMatrix {
 		assertTrue(matrix1.equals(matrix2));
 		matrix2.set(0, 0, VALUE + 1);
 		assertFalse(matrix1.equals(matrix2));
+	}
+
+	@Test
+	public void testForEach() {
+		Matrix<Integer> counts = new Matrix<Integer>(matrix.rows, matrix.columns);
+		for (int row = 0; row < counts.rows; ++row) {
+			for (int column = 0; column < counts.columns; ++column) {
+				counts.set(row, column, 0);
+			}
+		}
+		counts.forEach(new Matrix.OnEachHandler<Integer>() {
+			@Override
+			public void handle(Matrix<Integer> each, Matrix.Position pos) {
+				each.set(pos, each.get(pos) + 1);
+			}
+		});
+		for (int row = 0; row < counts.rows; ++row) {
+			for (int column = 0; column < counts.columns; ++column) {
+				assertTrue(counts.get(row, column) == 1);
+			}
+		}
 	}
 }

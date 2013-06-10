@@ -2,7 +2,12 @@ package com.gmail.leonidandand.puzzlesstudy.utils;
 
 
 
+
 public class Matrix<T> {
+
+	public interface OnEachHandler<T> {
+		void handle(Matrix<T> each, Position pos);
+	}
 
 	public static class Position {
 
@@ -113,6 +118,14 @@ public class Matrix<T> {
 		T temp = get(pos1);
 		set(pos1, get(pos2));
 		set(pos2, temp);
+	}
+
+	public void forEach(OnEachHandler<T> onEachHandler) {
+		for (int row = 0; row < this.rows; ++row) {
+			for (int column = 0; column < this.columns; ++column) {
+				onEachHandler.handle(this, new Position(row, column));
+			}
+		}
 	}
 
 }
