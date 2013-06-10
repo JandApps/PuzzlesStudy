@@ -5,54 +5,81 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import org.junit.Before;
 import org.junit.Test;
 
-import com.gmail.leonidandand.puzzlesstudy.utils.Matrix.Position;
-
-import android.annotation.SuppressLint;
-
 public class TestMatrix {
-
-	@SuppressLint("UseValueOf")
-	@Test
-	// TODO: refactoring
-	public void testMatrix() {
-		Matrix<Integer> matrix = new Matrix<Integer>(10, 20);
+	
+	private interface OnEachElementHandler {
+		void handle(Matrix<Integer> each, int row, int column);
+	}
+	
+	private void forEachElementOfMatrix(Matrix<Integer> matrix, OnEachElementHandler handler) {
 		for (int row = 0; row < matrix.rows; ++row) {
 			for (int column = 0; column < matrix.columns; ++column) {
-				matrix.set(row, column, elementForPosition(row, column));
-			}
-		}
-		for (int row = 0; row < matrix.rows; ++row) {
-			for (int column = 0; column < matrix.columns; ++column) {
-				assertEquals(new Integer(elementForPosition(row, column)), matrix.get(row, column));
-			}
-		}
-		Matrix<Integer> copy = new Matrix<Integer>(matrix);
-		assertEquals(matrix.rows, copy.rows);
-		assertEquals(matrix.columns, copy.columns);
-		for (int row = 0; row < copy.rows; ++row) {
-			for (int column = 0; column < copy.columns; ++column) {
-				assertEquals(matrix.get(row, column), copy.get(row, column));
+				handler.handle(matrix, row, column);
 			}
 		}
 	}
+
+	private static final Integer VALUE = 5;
+	private static final int ROWS = 10;
+	private static final int COLUMNS = 20;
+	private Matrix<Integer> matrix;
+
+	@Before
+	public void setUp() {
+		this.matrix = new Matrix<Integer>(ROWS, COLUMNS);
+	}
+
+	@Test
+	public void testMatrix() {
+		fillMatrix(matrix);
+		forEachElementOfMatrix(matrix, new OnEachElementHandler() {
+			@Override
+			public void handle(Matrix<Integer> each, int row, int column) {
+				assertEquals(elementForPosition(row, column), each.get(row, column));
+			}
+		});
+	}
 	
-	private int elementForPosition(int row, int column) {
+	private void fillMatrix(Matrix<Integer> matrix) {
+		forEachElementOfMatrix(matrix, new OnEachElementHandler() {
+			@Override
+			public void handle(Matrix<Integer> each, int row, int column) {
+				each.set(row, column, elementForPosition(row, column));
+			}
+		});
+	}
+	
+	@Test
+	public void testMatrixCopyConstructor() {
+		fillMatrix(matrix);
+		Matrix<Integer> copy = new Matrix<Integer>(matrix);
+		assertEquals(matrix.rows, copy.rows);
+		assertEquals(matrix.columns, copy.columns);
+		forEachElementOfMatrix(copy, new OnEachElementHandler() {
+			@Override
+			public void handle(Matrix<Integer> each, int row, int column) {
+				Integer expected = TestMatrix.this.matrix.get(row, column);
+				assertEquals(expected, each.get(row, column));
+			}
+		});
+	}
+	
+	private Integer elementForPosition(int row, int column) {
 		return row * column;
 	}
 
 	@Test
 	public void testInitValueIsNull() {
-		Matrix<Integer> matrix = new Matrix<Integer>(1, 1);
 		assertNull(matrix.get(0, 0));
 	}
 
 	@Test
 	public void testDimensionOfMatrix() {
-		Matrix<Integer> matrix = new Matrix<Integer>(2, 3);
-		assertEquals(2, matrix.rows);
-		assertEquals(3, matrix.columns);
+		assertEquals(ROWS, matrix.rows);
+		assertEquals(COLUMNS, matrix.columns);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
@@ -62,22 +89,22 @@ public class TestMatrix {
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testSetIllegalArguments() {
-		new Matrix<Integer>(5, 3).set(1, -1, 5);
+		matrix.set(1, -1, VALUE);
 	}
 
 	@Test(expected=IndexOutOfBoundsException.class)
 	public void testSetOutOfBoundsArguments() {
-		new Matrix<Integer>(4, 1).set(0, 2, 5);
+		matrix.set(0, COLUMNS + 1, VALUE);
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetIllegalArguments() {
-		new Matrix<Integer>(5, 3).get(1, -1);
+		matrix.get(1, -1);
 	}
 
 	@Test(expected=IndexOutOfBoundsException.class)
 	public void testGetOutOfBoundsArguments() {
-		new Matrix<Integer>(6, 1).get(0, 3);
+		matrix.get(ROWS + 1, 3);
 	}
 
 	@Test
@@ -85,37 +112,39 @@ public class TestMatrix {
 		Matrix<Integer> matrix = new Matrix<Integer>(2, 2);
 		Matrix.Position pos1 = new Matrix.Position(0, 0);
 		Matrix.Position pos2 = new Matrix.Position(1, 1);
-		matrix.set(pos1, new Integer(2));
-		matrix.set(pos2, new Integer(1));
+		Integer val1 = 1;
+		Integer val2 = 2;
+		matrix.set(pos1, val2);
+		matrix.set(pos2, val1);
 		matrix.swap(pos1, pos2);
-		assertEquals(new Integer(2), matrix.get(pos2));
-		assertEquals(new Integer(1), matrix.get(pos1));
+		assertEquals(val2, matrix.get(pos2));
+		assertEquals(val1, matrix.get(pos1));
 	}
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testSwapIllegalArguments() {
 		Matrix.Position pos1 = new Matrix.Position(0, 0);
 		Matrix.Position pos2 = new Matrix.Position(0, -1);
-		new Matrix<Integer>(2, 2).swap(pos1, pos2);
+		matrix.swap(pos1, pos2);
 	}
 
 	@Test(expected=IndexOutOfBoundsException.class)
 	public void testSwapPositionOutOfBounds() {
-		Matrix.Position pos1 = new Matrix.Position(0, 3);
+		Matrix.Position pos1 = new Matrix.Position(0, COLUMNS + 1);
 		Matrix.Position pos2 = new Matrix.Position(0, 0);
-		new Matrix<Integer>(2, 2).swap(pos1, pos2);
+		matrix.swap(pos1, pos2);
 	}
 
 	@Test
 	public void testEquals() {
 		Matrix<Integer> matrix1 = new Matrix<Integer>(1, 2);
 		Matrix<Integer> matrix2 = new Matrix<Integer>(1, 2);
-		matrix1.set(0, 0, 1);
-		matrix2.set(0, 0, 1);
-		matrix1.set(0, 1, 1);
-		matrix2.set(0, 1, 1);
+		matrix1.set(0, 0, VALUE);
+		matrix1.set(0, 1, VALUE);
+		matrix2.set(0, 0, VALUE);
+		matrix2.set(0, 1, VALUE);
 		assertTrue(matrix1.equals(matrix2));
-		matrix2.set(0, 0, 2);
+		matrix2.set(0, 0, VALUE + 1);
 		assertFalse(matrix1.equals(matrix2));
 	}
 }
