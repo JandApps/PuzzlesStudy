@@ -16,4 +16,30 @@
         android:layout_alignParentRight="true"
         android:text="Random" />
 
+    <Button
+        android:id="@+id/pickImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/randomImageButton"
+        android:layout_toLeftOf="@+id/randomImageButton"
+        android:text="Gallery" />
+
+    <com.gmail.leonidandand.puzzlesstudy.PuzzlesView
+        android:id="@+id/puzzlesView"
+        android:background="@android:color/black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/randomImageButton"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true" />
+
+    <Spinner
+        android:id="@+id/difficultyPicker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignTop="@+id/pickImageButton"
+        android:layout_toLeftOf="@+id/pickImageButton" />
+
 </RelativeLayout>

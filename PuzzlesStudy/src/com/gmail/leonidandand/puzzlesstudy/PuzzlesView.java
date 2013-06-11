@@ -6,7 +6,6 @@ import java.util.Collection;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -36,7 +35,6 @@ public class PuzzlesView extends View {
 
 	public PuzzlesView(Context context) {
 		super(context);
-		setBackgroundColor(Color.BLACK);
 	}
 
 	public PuzzlesView(Context context, AttributeSet attrs) {
