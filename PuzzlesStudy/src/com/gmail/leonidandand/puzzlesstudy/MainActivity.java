@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -37,6 +38,8 @@ public class MainActivity extends Activity {
 	private DimensionLoader dimensionLoader;
 	private final String[] difficultyNames = new String[] { "Easy", "Medium", "Hard" };
 
+	private Button mixButton;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -49,19 +52,31 @@ public class MainActivity extends Activity {
 			}
 		});
 		dimensionLoader = new DimensionLoader(getResources());
+		
 		initSpinner();
+		
 		findViewById(R.id.pickImageButton).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				onPickAndShowImage();
 			}
 		});
+		
 		findViewById(R.id.randomImageButton).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				onShowRandomImage();
 			}
 		});
+		
+		mixButton = (Button) findViewById(R.id.mixButton);
+		mixButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				puzzlesView.mix();
+			}
+		});
+		mixButton.setEnabled(false);
 	}
 
 	private void initSpinner() {
@@ -92,6 +107,7 @@ public class MainActivity extends Activity {
 		} else {
 			Dimension dim = dimensionLoader.dimension(difficultyNames[position]);
 			puzzlesView.setBitmap(bitmap, dim);
+			mixButton.setEnabled(true);
 		}
 	}
 

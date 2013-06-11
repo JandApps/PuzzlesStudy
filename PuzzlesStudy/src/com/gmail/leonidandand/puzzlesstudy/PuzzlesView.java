@@ -63,12 +63,16 @@ public class PuzzlesView extends View {
 	}
 
 	public void setBitmap(Bitmap bitmap) {
+		draggingStopped();
 		calculateSizes();
 		this.fullImage = scaleBitmap(bitmap);
 		cutIntoPuzzles();
 		arbitrator = new GameArbitrator(puzzles);
+		mix();
+	}
+	
+	public void mix() {
 		mixer.mix(puzzles);
-		draggingStopped();
 		invalidate();
 	}
 

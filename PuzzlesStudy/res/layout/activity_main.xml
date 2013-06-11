@@ -41,6 +41,14 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignTop="@+id/pickImageButton"
-        android:layout_toLeftOf="@+id/pickImageButton" />
+        android:layout_toLeftOf="@+id/mixButton" />
+
+    <Button
+        android:id="@+id/mixButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toLeftOf="@+id/pickImageButton"
+        android:text="Mix" />
 
 </RelativeLayout>
