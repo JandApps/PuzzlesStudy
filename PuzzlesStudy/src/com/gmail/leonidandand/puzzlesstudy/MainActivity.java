@@ -21,11 +21,11 @@ import com.gmail.leonidandand.puzzlesstudy.difficulty_level.DimensionLoader;
 public class MainActivity extends Activity {
 
 	private static final int[] imageIds = new int[] {
-		R.drawable.cut, R.drawable.google, R.drawable.kote,
-		R.drawable.nature1, R.drawable.nature2, R.drawable.nature3,
-		R.drawable.nature4, R.drawable.nature5, R.drawable.nature6,
+		R.drawable.cut, R.drawable.kote, R.drawable.pesik, R.drawable.pesik_2,
 		R.drawable.woman, R.drawable.woman2, R.drawable.woman5,
-		R.drawable.pesik, R.drawable.pesik_2,
+		R.drawable.bear, R.drawable.elephant1, R.drawable.leopard1, R.drawable.leopard2,
+		R.drawable.mountains1, R.drawable.mountains2, R.drawable.mountains3, R.drawable.mountains4,
+		R.drawable.wolf
 	};
 	
 	private static final int PICK_IMAGE = 42345;
@@ -73,8 +73,13 @@ public class MainActivity extends Activity {
 
 	private void onShowImage() {
 		curImagePos = getRandomPositionOfImage();
-		Bitmap bitmap = BitmapFactory.decodeResource(getResources(), imageIds[curImagePos]);
-		puzzlesView.setBitmap(bitmap, dimensionLoader.dimension(difficultyLevel));
+		try {
+			Bitmap bitmap = BitmapFactory.decodeResource(getResources(), imageIds[curImagePos]);
+			puzzlesView.setBitmap(bitmap, dimensionLoader.dimension(difficultyLevel));
+		} catch (OutOfMemoryError e) {
+			Toast.makeText(this, "Sorry. Image too big. Please, pick other image.", Toast.LENGTH_SHORT)
+				 .show();
+		}
 	}
 
 	public int getRandomPositionOfImage() {
