@@ -6,6 +6,8 @@ import java.util.Collection;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -18,7 +20,8 @@ import com.gmail.leonidandand.puzzlesstudy.utils.Size;
 
 public class PuzzlesView extends View {
 	private static final Dimension DEFAULT_DIMENSION = new Dimension(6, 4);
-	private static final int LATTICE_WIDTH = 1;
+	private static final int LATTICE_WIDTH = 2;
+	private static final int LATTICE_COLOR = Color.WHITE;
 	
 	private Dimension dim = DEFAULT_DIMENSION;
 	private Matrix<Bitmap> puzzles = new Matrix<Bitmap>(dim);
@@ -100,10 +103,32 @@ public class PuzzlesView extends View {
 	protected void onDraw(Canvas canvas) {
 		if (fullImage != null) {
 			this.canvas = canvas;
+			drawLattice();
 			drawPuzzles();
 		}
 	}
 	
+	private void drawLattice() {
+		int maxX = (puzzleSize.width + LATTICE_WIDTH) * dim.columns - LATTICE_WIDTH;
+		int maxY = (puzzleSize.height + LATTICE_WIDTH) * dim.rows - LATTICE_WIDTH;
+		Paint paint = preparePaintForLattice();
+		for (int column = 1; column < dim.columns; ++column) {
+			int startX = (puzzleSize.width + LATTICE_WIDTH) * column - 1;
+			canvas.drawLine(startX, 0, startX, maxY, paint);
+		}
+		for (int row = 1; row < dim.rows; ++row) {
+			int startY = (puzzleSize.height + LATTICE_WIDTH) * row - 1;
+			canvas.drawLine(0, startY, maxX, startY, paint);
+		}
+	}
+
+	private Paint preparePaintForLattice() {
+		Paint paint = new Paint();
+		paint.setColor(LATTICE_COLOR);
+		paint.setStrokeWidth(LATTICE_WIDTH);
+		return paint;
+	}
+
 	private void drawPuzzles() {
 		puzzles.forEach(new Matrix.OnEachHandler<Bitmap>() {
 			@Override
