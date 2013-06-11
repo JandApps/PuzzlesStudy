@@ -106,7 +106,7 @@ public class MainActivity extends Activity {
 			Toast.makeText(this, "Please, pick difficulty", Toast.LENGTH_SHORT).show();
 		} else {
 			Dimension dim = dimensionLoader.dimension(difficultyNames[position]);
-			puzzlesView.setBitmap(bitmap, dim);
+			puzzlesView.set(bitmap, dim);
 			mixButton.setEnabled(true);
 		}
 	}

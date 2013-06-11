@@ -52,7 +52,7 @@ public class PuzzlesView extends View {
 		onGameFinishedListeners.add(listener);
 	}
 	
-	public void setBitmap(Bitmap bitmap, Dimension dim) {
+	public void set(Bitmap bitmap, Dimension dim) {
 		setDimension(dim);
 		setBitmap(bitmap);
 	}
@@ -62,7 +62,7 @@ public class PuzzlesView extends View {
 		puzzles = new Matrix<Bitmap>(dim);
 	}
 
-	public void setBitmap(Bitmap bitmap) {
+	private void setBitmap(Bitmap bitmap) {
 		draggingStopped();
 		calculateSizes();
 		this.fullImage = scaleBitmap(bitmap);
