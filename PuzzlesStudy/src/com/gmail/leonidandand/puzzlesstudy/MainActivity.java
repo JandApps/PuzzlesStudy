@@ -24,25 +24,27 @@ import com.gmail.leonidandand.puzzlesstudy.utils.Dimension;
 public class MainActivity extends Activity {
 
 	private static final int[] imageIds = new int[] {
-		R.drawable.cut, R.drawable.kote, R.drawable.pesik, R.drawable.pesik_2,
-		R.drawable.woman, R.drawable.woman2, R.drawable.leopard1, R.drawable.leopard2,
-		R.drawable.mountains1
+		R.drawable.cut, R.drawable.kote, R.drawable.pesik,
+		R.drawable.woman, R.drawable.leopard1
 	};
+	private static final String[] difficultyNames = new String[] { "Easy", "Medium", "Hard" };
 	
 	private static final int PICK_IMAGE = 42345;
 
 	private int curImagePos = 0;
+	private Bitmap currentBitmap;
 	private Random random = new Random();
 	private PuzzlesView puzzlesView;
 	private Spinner difficultyPicker;
-	private DimensionLoader dimensionLoader;
-	private final String[] difficultyNames = new String[] { "Easy", "Medium", "Hard" };
-
 	private Button mixButton;
+	private DimensionLoader dimensionLoader;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		ResourceReader.init(getResources());
 		setContentView(R.layout.activity_main);
 		puzzlesView = (PuzzlesView) findViewById(R.id.puzzlesView);
 		puzzlesView.addOnGameFinishedListener(new OnGameFinishedListener() {
@@ -101,6 +103,7 @@ public class MainActivity extends Activity {
 	}
 	
 	private void setBitmap(Bitmap bitmap) {
+		setCurrentBitmap(bitmap);
 		int position = difficultyPicker.getSelectedItemPosition();
 		if (position == AdapterView.INVALID_POSITION) {
 			Toast.makeText(this, "Please, pick difficulty", Toast.LENGTH_SHORT).show();
@@ -109,6 +112,13 @@ public class MainActivity extends Activity {
 			puzzlesView.set(bitmap, dim);
 			mixButton.setEnabled(true);
 		}
+	}
+
+	private void setCurrentBitmap(Bitmap bitmap) {
+		if (currentBitmap != null && !currentBitmap.equals(bitmap)) {
+			currentBitmap.recycle();
+		}
+		currentBitmap = bitmap;
 	}
 
 	public int getRandomPositionOfImage() {

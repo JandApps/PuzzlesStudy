@@ -51,13 +51,14 @@ public class Matrix<T> {
 		this(dim.rows, dim.columns);
 	}
 	
-	public Matrix(Matrix<T> puzzles) {
-		this(puzzles.rows, puzzles.columns);
-		for (int row = 0; row < this.rows; ++row) {
-			for (int column = 0; column < this.columns; ++column) {
-				set(row, column, puzzles.get(row, column));
+	public Matrix(Matrix<T> other) {
+		this(other.rows, other.columns);
+		other.forEach(new OnEachHandler<T>() {
+			@Override
+			public void handle(Matrix<T> matrix, Position pos) {
+				Matrix.this.set(pos, matrix.get(pos));
 			}
-		}
+		});
 	}
 
 	public void set(Position pos, T value) {
