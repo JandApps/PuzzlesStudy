@@ -21,7 +21,7 @@ import com.gmail.leonidandand.puzzlesstudy.utils.Size;
 public class PuzzlesView extends View {
 	private static final Dimension DEFAULT_DIMENSION = new Dimension(6, 4);
 	private static final int LATTICE_WIDTH = 2;
-	private static final int LATTICE_COLOR = Color.WHITE;
+	private static final int LATTICE_COLOR = Color.LTGRAY;
 	
 	private Dimension dim = DEFAULT_DIMENSION;
 	private Matrix<Bitmap> puzzles = new Matrix<Bitmap>(dim);
@@ -109,17 +109,26 @@ public class PuzzlesView extends View {
 	}
 	
 	private void drawLattice() {
-		int maxX = (puzzleSize.width + LATTICE_WIDTH) * dim.columns - LATTICE_WIDTH;
-		int maxY = (puzzleSize.height + LATTICE_WIDTH) * dim.rows - LATTICE_WIDTH;
+		Point rightDownPoint = puzzlesRightDownPoint();
 		Paint paint = preparePaintForLattice();
 		for (int column = 1; column < dim.columns; ++column) {
-			int startX = (puzzleSize.width + LATTICE_WIDTH) * column - 1;
-			canvas.drawLine(startX, 0, startX, maxY, paint);
+			Point startPoint = latticeLineStartPoint(0, column);
+			canvas.drawLine(startPoint.x, 0, startPoint.x, rightDownPoint.y, paint);
 		}
 		for (int row = 1; row < dim.rows; ++row) {
-			int startY = (puzzleSize.height + LATTICE_WIDTH) * row - 1;
-			canvas.drawLine(0, startY, maxX, startY, paint);
+			Point startPoint = latticeLineStartPoint(row, 0);
+			canvas.drawLine(0, startPoint.y, rightDownPoint.x, startPoint.y, paint);
 		}
+	}
+	
+	private Point latticeLineStartPoint(int row, int column) {
+		Point point = leftUpperOfPuzzle(new Position(row, column));
+		return new Point(point.x - 1, point.y - 1);
+	}
+	
+	private Point puzzlesRightDownPoint() {
+		Point point = leftUpperOfPuzzle(new Matrix.Position(dim.rows, dim.columns));
+		return new Point(point.x - LATTICE_WIDTH, point.y - LATTICE_WIDTH);
 	}
 
 	private Paint preparePaintForLattice() {
