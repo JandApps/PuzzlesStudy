@@ -15,17 +15,15 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.gmail.leonidandand.puzzlesstudy.difficulty_level.DifficultyLevel;
-import com.gmail.leonidandand.puzzlesstudy.difficulty_level.DimensionLoader;
+import com.gmail.leonidandand.puzzlesstudy.difficulty.Difficulty;
+import com.gmail.leonidandand.puzzlesstudy.difficulty.DimensionLoader;
 
 public class MainActivity extends Activity {
 
 	private static final int[] imageIds = new int[] {
 		R.drawable.cut, R.drawable.kote, R.drawable.pesik, R.drawable.pesik_2,
-		R.drawable.woman, R.drawable.woman2, R.drawable.woman5,
-		R.drawable.bear, R.drawable.elephant1, R.drawable.leopard1, R.drawable.leopard2,
-		R.drawable.mountains1, R.drawable.mountains2, R.drawable.mountains3, R.drawable.mountains4,
-		R.drawable.wolf
+		R.drawable.woman, R.drawable.woman2, R.drawable.leopard1, R.drawable.leopard2,
+		R.drawable.mountains1, R.drawable.wolf
 	};
 	
 	private static final int PICK_IMAGE = 42345;
@@ -34,7 +32,7 @@ public class MainActivity extends Activity {
 	private Random random = new Random();
 	private PuzzlesView puzzlesView;
 	private DimensionLoader dimensionLoader;
-	private DifficultyLevel difficultyLevel = DifficultyLevel.EASY;
+	private Difficulty difficulty = Difficulty.EASY;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +73,7 @@ public class MainActivity extends Activity {
 		curImagePos = getRandomPositionOfImage();
 		try {
 			Bitmap bitmap = BitmapFactory.decodeResource(getResources(), imageIds[curImagePos]);
-			puzzlesView.setBitmap(bitmap, dimensionLoader.dimension(difficultyLevel));
+			puzzlesView.setBitmap(bitmap, dimensionLoader.dimension(difficulty));
 		} catch (OutOfMemoryError e) {
 			Toast.makeText(this, "Sorry. Image too big. Please, pick other image.", Toast.LENGTH_SHORT)
 				 .show();
@@ -110,7 +108,7 @@ public class MainActivity extends Activity {
 		String imageFilePath = imageFilePathByUri(uri);
 		try {
 			Bitmap bitmap = getBitmapByPath(imageFilePath);
-			puzzlesView.setBitmap(bitmap, dimensionLoader.dimension(difficultyLevel));
+			puzzlesView.setBitmap(bitmap, dimensionLoader.dimension(difficulty));
 		} catch (Exception e) {
 			String message = "Cannot load image. Please, choose other image.\n" + e.getMessage();
 			Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
