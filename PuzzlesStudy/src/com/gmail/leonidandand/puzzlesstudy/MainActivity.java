@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -34,9 +33,7 @@ public class MainActivity extends Activity {
 	private int curImagePos = 0;
 	private Bitmap currentBitmap;
 	private Random random = new Random();
-	private PuzzlesView puzzlesView;
 	private Spinner difficultyPicker;
-	private Button mixButton;
 	private DimensionLoader dimensionLoader;
 
 
@@ -46,17 +43,8 @@ public class MainActivity extends Activity {
 		
 		ResourceReader.init(getResources());
 		setContentView(R.layout.activity_main);
-		puzzlesView = (PuzzlesView) findViewById(R.id.puzzlesView);
-		puzzlesView.addOnGameFinishedListener(new OnGameFinishedListener() {
-			@Override
-			public void onGameFinished() {
-				Toast.makeText(MainActivity.this, "Excellent!", Toast.LENGTH_SHORT).show();
-			}
-		});
 		dimensionLoader = new DimensionLoader(getResources());
-		
 		initSpinner();
-		
 		findViewById(R.id.pickImageButton).setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -70,15 +58,6 @@ public class MainActivity extends Activity {
 				onShowRandomImage();
 			}
 		});
-		
-		mixButton = (Button) findViewById(R.id.mixButton);
-		mixButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				puzzlesView.mix();
-			}
-		});
-		mixButton.setEnabled(false);
 	}
 
 	private void initSpinner() {
@@ -109,8 +88,7 @@ public class MainActivity extends Activity {
 			Toast.makeText(this, "Please, pick difficulty", Toast.LENGTH_SHORT).show();
 		} else {
 			Dimension dim = dimensionLoader.dimension(difficultyNames[position]);
-			puzzlesView.set(bitmap, dim);
-			mixButton.setEnabled(true);
+			startGame(dim);
 		}
 	}
 
@@ -119,6 +97,13 @@ public class MainActivity extends Activity {
 			currentBitmap.recycle();
 		}
 		currentBitmap = bitmap;
+	}
+
+	private void startGame(Dimension dim) {
+		SaverLoader.save("bitmap", currentBitmap);
+		SaverLoader.save("dim", dim);
+		Intent intent = new Intent(this, StarterActivity.class);
+		startActivity(intent);
 	}
 
 	public int getRandomPositionOfImage() {
