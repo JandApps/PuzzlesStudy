@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="lattice_color">#ffcccccc</color>
-    <color name="commutable_puzzle_color">#a0968c82</color>
+    <color name="commutable_puzzle_color">#4fb8ea8b</color>
     
 </resources>

@@ -12,4 +12,8 @@ public class ResourceReader {
 	public static int colorById(int id) {
 		return resources.getColor(id);
 	}
+	
+	public static int integerById(int id) {
+		return resources.getInteger(id);
+	}
 }

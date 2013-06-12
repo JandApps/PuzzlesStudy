@@ -20,8 +20,12 @@ import com.gmail.leonidandand.puzzlesstudy.utils.Matrix.Position;
 import com.gmail.leonidandand.puzzlesstudy.utils.Size;
 
 public class PuzzlesView extends View {
-	private final int LATTICE_WIDTH = 2;
-	private final float ALLOWABLE_ERROR = 0.4f;
+	private final int LATTICE_WIDTH = ResourceReader.integerById(R.integer.lattice_width);
+	private final float ALLOWABLE_ERROR = allowableError();
+	
+	private float allowableError() {
+		return ResourceReader.integerById(R.integer.allowable_error) / 100f;
+	}
 	
 	private Dimension dim;
 	private Bitmap fullImage;
