@@ -1,5 +1,5 @@
 package com.gmail.leonidandand.puzzlesstudy;
 
-public interface OnGameFinishedListener {
+public interface OnPuzzleAssembledListener {
 	void onGameFinished();
 }

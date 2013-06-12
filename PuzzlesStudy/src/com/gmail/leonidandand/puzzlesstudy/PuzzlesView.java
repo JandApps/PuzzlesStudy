@@ -31,9 +31,9 @@ public class PuzzlesView extends View {
 	private Bitmap fullImage;
 	private Matrix<Bitmap> puzzles;
 	private Mixer mixer = new Mixer();
-	private Collection<OnGameFinishedListener> onGameFinishedListeners =
-								new ArrayList<OnGameFinishedListener>();
-	private GameArbitrator arbitrator;
+	private Collection<OnPuzzleAssembledListener> onPuzzleAssembledListeners =
+								new ArrayList<OnPuzzleAssembledListener>();
+	private Arbitrator arbitrator;
 	private Size puzzleSize;
 	private Point lastTouchedPoint;
 	private Point draggedLeftUpper;
@@ -54,8 +54,8 @@ public class PuzzlesView extends View {
 		super(context, attrs, defStyle);
 	}
 	
-	public void addOnGameFinishedListener(OnGameFinishedListener listener) {
-		onGameFinishedListeners.add(listener);
+	public void addOnPuzzleAssembledListener(OnPuzzleAssembledListener listener) {
+		onPuzzleAssembledListeners.add(listener);
 	}
 	
 	public void set(Bitmap bitmap, Dimension dim) {
@@ -93,7 +93,7 @@ public class PuzzlesView extends View {
 		calculatePuzzleSize();
 		fullImage = scaledToFullSize(bitmap);
 		cutIntoPuzzles();
-		arbitrator = new GameArbitrator(puzzles);
+		arbitrator = new Arbitrator(puzzles);
 		mix();
 	}
 
@@ -348,13 +348,13 @@ public class PuzzlesView extends View {
 		nearestPosition = null;
 		draggingStopped();
 		invalidate();
-		if (arbitrator.gameFinished(puzzles)) {
-			notifyThatGameFinished();
+		if (arbitrator.puzzleAssembled(puzzles)) {
+			notifyThatPuzzleAssembled();
 		}
 	}
 		
-	private void notifyThatGameFinished() {
-		for (OnGameFinishedListener each : onGameFinishedListeners) {
+	private void notifyThatPuzzleAssembled() {
+		for (OnPuzzleAssembledListener each : onPuzzleAssembledListeners) {
 			each.onGameFinished();
 		}
 	}

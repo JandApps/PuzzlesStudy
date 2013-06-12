@@ -1,7 +1,6 @@
 package com.gmail.leonidandand.puzzlesstudy;
 
 import java.io.File;
-import java.util.Random;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -22,17 +21,10 @@ import com.gmail.leonidandand.puzzlesstudy.utils.Dimension;
 
 public class MainActivity extends Activity {
 
-	private static final int[] imageIds = new int[] {
-		R.drawable.cut, R.drawable.kote, R.drawable.pesik,
-		R.drawable.woman, R.drawable.leopard1
-	};
 	private static final String[] difficultyNames = new String[] { "Easy", "Medium", "Hard" };
 	
 	private static final int PICK_IMAGE = 42345;
 
-	private int curImagePos = 0;
-	private Bitmap currentBitmap;
-	private Random random = new Random();
 	private Spinner difficultyPicker;
 	private DimensionLoader dimensionLoader;
 
@@ -40,7 +32,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+		ImageGenerator.getInstance().setResources(getResources());
 		ResourceReader.init(getResources());
 		setContentView(R.layout.activity_main);
 		dimensionLoader = new DimensionLoader(getResources());
@@ -71,46 +63,31 @@ public class MainActivity extends Activity {
 	}
 	
 	private void onShowRandomImage() {
-		curImagePos = getRandomPositionOfImage();
 		try {
-			Bitmap bitmap = BitmapFactory.decodeResource(getResources(), imageIds[curImagePos]);
+			ImageGenerator generator = ImageGenerator.getInstance();
+			Bitmap bitmap = generator.randomImage();
 			setBitmap(bitmap);
 		} catch (OutOfMemoryError e) {
-			Toast.makeText(this, "Sorry. Image too big. Please, pick other image.", Toast.LENGTH_SHORT)
-				 .show();
+			Toast.makeText(this, "Sorry. Image too big. Please, pick other image.",
+						Toast.LENGTH_SHORT).show();
 		}
 	}
 	
 	private void setBitmap(Bitmap bitmap) {
-		setCurrentBitmap(bitmap);
 		int position = difficultyPicker.getSelectedItemPosition();
 		if (position == AdapterView.INVALID_POSITION) {
 			Toast.makeText(this, "Please, pick difficulty", Toast.LENGTH_SHORT).show();
 		} else {
 			Dimension dim = dimensionLoader.dimension(difficultyNames[position]);
-			startGame(dim);
+			startGame(bitmap, dim);
 		}
 	}
 
-	private void setCurrentBitmap(Bitmap bitmap) {
-		if (currentBitmap != null && !currentBitmap.equals(bitmap)) {
-			currentBitmap.recycle();
-		}
-		currentBitmap = bitmap;
-	}
-
-	private void startGame(Dimension dim) {
-		SaverLoader.save("bitmap", currentBitmap);
+	private void startGame(Bitmap bitmap, Dimension dim) {
+		SaverLoader.save("bitmap", bitmap);
 		SaverLoader.save("dim", dim);
 		Intent intent = new Intent(this, StarterActivity.class);
 		startActivity(intent);
-	}
-
-	public int getRandomPositionOfImage() {
-		int randomPosition = random.nextInt(imageIds.length);
-		return ((imageIds.length > 1 && randomPosition != curImagePos)
-					? randomPosition
-					: getRandomPositionOfImage());
 	}
 
 	private void onPickAndShowImage() {

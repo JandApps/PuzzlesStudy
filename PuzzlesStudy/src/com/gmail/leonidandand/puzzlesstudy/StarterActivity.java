@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
@@ -18,8 +17,9 @@ public class StarterActivity extends Activity {
 	private TextView textView;
 	private ImageView imageView;
 	private PuzzlesView puzzlesView;
-	private ImageButton showFullImageButton;
+	private ImageButton previewButton;
 	private ImageButton mixButton;
+	private ImageButton nextImageButton;
 	private boolean gameStarted;
 
 	@Override
@@ -27,18 +27,35 @@ public class StarterActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_starter);
 		findViews();
+		setPreview();
+		setListeners();
+	}
+
+	private void findViews() {
+		puzzlesView = (PuzzlesView) findViewById(R.id.puzzlesView);
+		previewButton = (ImageButton) findViewById(R.id.previewButton);
+		mixButton = (ImageButton) findViewById(R.id.mixButton);
+		nextImageButton = (ImageButton) findViewById(R.id.nextImageButton);
+		textView = (TextView) findViewById(R.id.textView);
+		imageView = (ImageView) findViewById(R.id.imageView);
+	}
+	
+	private void setPreview() {
 		Bitmap bitmap = (Bitmap) SaverLoader.load("bitmap");
 		imageView.setBackgroundDrawable(new BitmapDrawable(bitmap));
+	}
+
+	private void setListeners() {
 		imageView.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				onStartGame();
 			}
 		});
-		showFullImageButton.setOnClickListener(new OnClickListener() {
+		previewButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				onShowFullImage();
+				onPreview();
 			}
 		});
 		mixButton.setOnClickListener(new OnClickListener() {
@@ -47,22 +64,18 @@ public class StarterActivity extends Activity {
 				puzzlesView.mix();
 			}
 		});
-		puzzlesView.addOnGameFinishedListener(new OnGameFinishedListener() {
+		nextImageButton.setOnClickListener(new OnClickListener() {
 			@Override
-			public void onGameFinished() {
-				Toast.makeText(StarterActivity.this, "Excellent", Toast.LENGTH_SHORT).show();
-				puzzlesView.mix();
-				onShowFullImage();
+			public void onClick(View v) {
+				onNextImage();
 			}
 		});
-	}
-
-	private void findViews() {
-		puzzlesView = (PuzzlesView) findViewById(R.id.puzzlesView);
-		showFullImageButton = (ImageButton) findViewById(R.id.showFullImageButton);
-		mixButton = (ImageButton) findViewById(R.id.mixButton);
-		textView = (TextView) findViewById(R.id.textView);
-		imageView = (ImageView) findViewById(R.id.imageView);
+		puzzlesView.addOnPuzzleAssembledListener(new OnPuzzleAssembledListener() {
+			@Override
+			public void onGameFinished() {
+				onPuzzleAssembled();
+			}
+		});
 	}
 
 	private void onStartGame() {
@@ -75,7 +88,7 @@ public class StarterActivity extends Activity {
 
 	private void resetScreen(int previewVisibility, int puzzlesVisibility) {
 		changeVisibility(previewVisibility, textView, imageView);
-		changeVisibility(puzzlesVisibility, puzzlesView, mixButton, showFullImageButton);		
+		changeVisibility(puzzlesVisibility, puzzlesView, mixButton, previewButton);		
 	}
 	
 	private void setPuzzles() {
@@ -90,15 +103,38 @@ public class StarterActivity extends Activity {
 		}
 	}
 	
-	private void onShowFullImage() {
+	private void onPreview() {
 		resetScreen(View.VISIBLE, View.INVISIBLE);
+	}
+
+	private void onNextImage() {
+		ImageGenerator imageGenerator = ImageGenerator.getInstance();
+		try {
+			Bitmap bitmap = imageGenerator.randomImage();
+			gameStarted = false;
+			resetPreview(bitmap);
+			onPreview();
+		} catch (OutOfMemoryError e) {
+			Toast.makeText(this, "Image too big. Please pick other image",
+					Toast.LENGTH_SHORT).show();
+		}
+	}
+	
+	private void resetPreview(Bitmap bitmap) {
+		SaverLoader.save("bitmap", bitmap);
+		setPreview();
+	}
+
+	private void onPuzzleAssembled() {
+		Toast.makeText(StarterActivity.this, "Excellent", Toast.LENGTH_SHORT).show();
+		puzzlesView.mix();
+		onPreview();
 	}
 
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 		puzzlesView.releaseImageResources();
-		Log.d("leonidandand", "StarterActivity.onDestroy()");
 	}
 	
 }

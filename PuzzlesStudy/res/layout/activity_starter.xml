@@ -8,20 +8,10 @@
         android:id="@+id/imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/nextImageButton"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true" />
-
-    <ImageButton
-        android:id="@+id/mixButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:background="@null"
-        android:src="@android:drawable/ic_menu_rotate"
-        android:visibility="invisible" />
 
     <com.gmail.leonidandand.puzzlesstudy.PuzzlesView
         android:id="@+id/puzzlesView"
@@ -34,7 +24,7 @@
         android:visibility="invisible" />
 
     <ImageButton
-        android:id="@+id/showFullImageButton"
+        android:id="@+id/previewButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -51,7 +41,26 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:gravity="center"
-        android:text="Tap image to Start Game"
+        android:text="Tap image"
         android:textSize="22sp" />
+
+    <ImageButton
+        android:id="@+id/mixButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:background="@null"
+        android:src="@android:drawable/ic_menu_rotate"
+        android:visibility="invisible" />
+
+    <ImageButton
+        android:id="@+id/nextImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:background="@null"
+        android:src="@android:drawable/ic_menu_directions" />
 
 </RelativeLayout>
