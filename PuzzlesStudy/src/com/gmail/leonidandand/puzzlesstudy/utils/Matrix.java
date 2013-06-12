@@ -89,19 +89,20 @@ public class Matrix<T> {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (!(obj instanceof Matrix<?>)) {
+		if ((obj == null) || !(obj instanceof Matrix<?>)) {
 			return false;
 		}
-		@SuppressWarnings("unchecked")
-		Matrix<T> other = (Matrix<T>) obj;
+		Matrix<?> other = (Matrix<?>) obj;
 		if (other.rows != rows || other.columns != columns) {
 			return false;
 		}
 		for (int row = 0; row < rows; ++row) {
 			for (int column = 0; column < columns; ++column) {
-				T elementOfThis = get(row, column);
-				T elementOfOther = other.get(row, column);
-				if (!elementOfThis.equals(elementOfOther)) {
+				Object elementOfThis = get(row, column);
+				Object elementOfOther = other.get(row, column);
+				if ((elementOfThis == null && elementOfOther != null) ||
+					(elementOfOther == null && elementOfThis != null) ||
+					(elementOfThis != null && !elementOfThis.equals(elementOfOther))) {
 					return false;
 				}
 			}

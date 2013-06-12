@@ -139,6 +139,30 @@ public class TestMatrix {
 	}
 
 	@Test
+	public void testEqualityWithNull() {
+		assertFalse(matrix.equals(null));
+	}
+
+	@Test
+	public void testEqualsDifferentClass() {
+		assertFalse(matrix.equals(Integer.valueOf(1)));
+	}
+
+	@Test
+	public void testEqualsSameClassDifferentParameter() {
+		Matrix<Integer> integerMatrix = new Matrix<Integer>(1, 1);
+		integerMatrix.set(0, 0, Integer.valueOf(0));
+		Matrix<Boolean> booleanMatrix = new Matrix<Boolean>(1, 1);
+		booleanMatrix.set(0, 0, Boolean.valueOf(false));
+		assertFalse(integerMatrix.equals(booleanMatrix));
+	}
+
+	@Test
+	public void testEqualsMatrixWithNullElements() {
+		assertEquals(matrix, new Matrix<Integer>(ROWS, COLUMNS));
+	}
+
+	@Test
 	public void testForEach() {
 		Matrix<Integer> counts = new Matrix<Integer>(matrix.rows, matrix.columns);
 		for (int row = 0; row < counts.rows; ++row) {

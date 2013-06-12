@@ -59,9 +59,7 @@ public class PuzzlesView extends View {
 	}
 	
 	public void set(Bitmap bitmap, Dimension dim) {
-		if (imageWasSet()) {
-			releasePreviousImageResources();
-		}
+		releaseImageResources();
 		setDimension(dim);
 		setBitmap(bitmap);
 	}
@@ -70,7 +68,10 @@ public class PuzzlesView extends View {
 		return (fullImage != null);
 	}
 	
-	private void releasePreviousImageResources() {
+	public void releaseImageResources() {
+		if (!imageWasSet()) {
+			return;
+		}
 		fullImage.recycle();
 		puzzles.forEach(new Matrix.OnEachHandler<Bitmap>() {
 			@Override
