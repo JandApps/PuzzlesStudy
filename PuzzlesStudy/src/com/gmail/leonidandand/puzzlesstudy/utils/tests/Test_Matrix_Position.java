@@ -10,7 +10,6 @@ import com.gmail.leonidandand.puzzlesstudy.utils.Matrix;
 
 
 public class Test_Matrix_Position {
-
 	@Test
 	public void testCreation() {
 		Matrix.Position pos = new Matrix.Position(1, 2);
@@ -29,5 +28,4 @@ public class Test_Matrix_Position {
 		assertFalse(new Matrix.Position(1, 2).equals(new Matrix.Position(0, 0)));
 		assertFalse(new Matrix.Position(1, 2).equals(null));
 	}
-
 }

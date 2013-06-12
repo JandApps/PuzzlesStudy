@@ -8,7 +8,6 @@ import com.gmail.leonidandand.puzzlesstudy.utils.Dimension;
 
 
 public class TestDimesion {
-
 	@Test
 	public void testCreation() {
 		final int rows = 1;
@@ -37,5 +36,4 @@ public class TestDimesion {
 	public void testColumnsIsNegative() {
 		new Dimension(1, -1);
 	}
-
 }

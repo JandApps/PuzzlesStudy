@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import com.gmail.leonidandand.puzzlesstudy.utils.Matrix;
 
 public class GameArbitrator {
-
 	private Matrix<Bitmap> startPuzzles;
 
 	public GameArbitrator(Matrix<Bitmap> puzzles) {
@@ -22,5 +21,4 @@ public class GameArbitrator {
 		}
 		return true;
 	}
-
 }

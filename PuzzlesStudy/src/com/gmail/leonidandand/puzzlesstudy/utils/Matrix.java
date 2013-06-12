@@ -1,8 +1,5 @@
 package com.gmail.leonidandand.puzzlesstudy.utils;
 
-
-
-
 public class Matrix<T> {
 
 	public interface OnEachHandler<T> {
@@ -10,7 +7,6 @@ public class Matrix<T> {
 	}
 
 	public static class Position {
-
 		public final int row;
 		public final int column;
 
@@ -30,7 +26,6 @@ public class Matrix<T> {
 			Matrix.Position other = (Matrix.Position) obj;
 			return (this.row == other.row) && (this.column == other.column);
 		}
-
 	}
 
 	public final int rows;
@@ -121,7 +116,6 @@ public class Matrix<T> {
 		int hashCode = hashCode1 * hashCode2;
 		hashCode += Math.max(hashCode1, hashCode2) / Math.min(hashCode1, hashCode2);
 		return hashCode;
-		
 	}
 
 	public void swap(Position pos1, Position pos2) {
@@ -137,5 +131,4 @@ public class Matrix<T> {
 			}
 		}
 	}
-
 }

@@ -24,9 +24,9 @@ public class PuzzlesView extends View {
 	private final float ALLOWABLE_ERROR = 0.4f;
 	
 	private Dimension dim;
+	private Bitmap fullImage;
 	private Matrix<Bitmap> puzzles;
 	private Mixer mixer = new Mixer();
-	private Bitmap fullImage = null;
 	private Collection<OnGameFinishedListener> onGameFinishedListeners =
 								new ArrayList<OnGameFinishedListener>();
 	private GameArbitrator arbitrator;
@@ -188,7 +188,8 @@ public class PuzzlesView extends View {
 				if (!existDraggedPuzzle() || !pos.equals(draggedPosition)) {
 					Point leftUpper = leftUpperOfPuzzle(pos);
 					Paint paint = paintForPosition(pos);
-					canvas.drawBitmap(puzzles.get(pos), leftUpper.x, leftUpper.y, paint);
+					Bitmap puzzle = puzzles.get(pos);
+					canvas.drawBitmap(puzzle, leftUpper.x, leftUpper.y, paint);
 				}
 			}
 		});
@@ -265,7 +266,7 @@ public class PuzzlesView extends View {
 
 	private void onDownTouch(Point pt) {
 		Matrix.Position pos = positionByPoint(pt);
-		if (validPuzzlePosition(pos) && insidePuzzle(pt)) {
+		if (insideGameBoard(pos) && insidePuzzle(pt)) {
 			lastTouchedPoint = pt;
 			draggedPosition = pos;
 			draggedLeftUpper = leftUpperOfPuzzle(pos);
@@ -277,9 +278,10 @@ public class PuzzlesView extends View {
 		int row = pt.y / (puzzleSize.height + LATTICE_WIDTH);
 		return new Matrix.Position(row, column);
 	}
-	
-	private boolean validPuzzlePosition(Matrix.Position pos) {
-		return (pos.row < dim.rows) && (pos.column < dim.columns);
+
+	private boolean insideGameBoard(Position pos) {
+		return pos.row >= 0 && pos.row < dim.rows &&
+			   pos.column >= 0 && pos.column < dim.columns;
 	}
 
 	private boolean insidePuzzle(Point pt) {
@@ -314,11 +316,6 @@ public class PuzzlesView extends View {
 				checkCloseness(each);
 			}
 		}
-	}
-
-	private boolean insideGameBoard(Position pos) {
-		return pos.row >= 0 && pos.row < dim.rows &&
-			   pos.column >= 0 && pos.column < dim.columns;
 	}
 
 	private void checkCloseness(Position pos) {

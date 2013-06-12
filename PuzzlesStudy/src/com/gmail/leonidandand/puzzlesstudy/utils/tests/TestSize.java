@@ -8,7 +8,6 @@ import com.gmail.leonidandand.puzzlesstudy.utils.Size;
 
 
 public class TestSize {
-
 	@Test
 	public void testCreation() {
 		Size size = new Size(1, 2);
@@ -20,5 +19,4 @@ public class TestSize {
 	public void testIllegalSize() {
 		new Size(1, -2);
 	}
-
 }

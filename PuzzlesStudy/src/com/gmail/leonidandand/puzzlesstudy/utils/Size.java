@@ -1,7 +1,6 @@
 package com.gmail.leonidandand.puzzlesstudy.utils;
 
 public class Size {
-	
 	public final int width;
 	public final int height;
 
@@ -12,5 +11,4 @@ public class Size {
 		this.width = width;
 		this.height = height;
 	}
-
 }

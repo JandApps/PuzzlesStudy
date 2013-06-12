@@ -12,7 +12,6 @@ import com.gmail.leonidandand.puzzlesstudy.utils.Matrix;
 import com.gmail.leonidandand.puzzlesstudy.utils.Matrix.Position;
 
 public class TestMatrix {
-
 	private static final Integer VALUE = 5;
 	private static final int ROWS = 10;
 	private static final int COLUMNS = 20;
@@ -179,14 +178,14 @@ public class TestMatrix {
 		});
 	}
 
-	protected void assertPreviousElementByPassed(Matrix<Boolean> matrix, Position pos) {
+	private void assertPreviousElementByPassed(Matrix<Boolean> matrix, Position pos) {
 		if (!pos.equals(new Matrix.Position(0, 0))) {
 			Matrix.Position positionBefore = positionBefore(matrix.rows, matrix.columns, pos);
 			assertTrue(matrix.get(positionBefore));
 		}
 	}
 
-	protected void assertNextElementNotByPassed(Matrix<Boolean> matrix, Position pos) {
+	private void assertNextElementNotByPassed(Matrix<Boolean> matrix, Position pos) {
 		Matrix.Position lastPos = new Matrix.Position(matrix.rows - 1, matrix.columns - 1);
 		if (!pos.equals(lastPos)) {
 			Matrix.Position positionAfter = positionAfter(matrix.rows, matrix.columns, pos);
@@ -194,7 +193,7 @@ public class TestMatrix {
 		}
 	}
 
-	protected Matrix.Position positionBefore(int rows, int columns, Position pos) {
+	private Matrix.Position positionBefore(int rows, int columns, Position pos) {
 		if (pos.column - 1 < 0) {
 			return new Matrix.Position(pos.row - 1, columns - 1);
 		} else {
@@ -202,7 +201,7 @@ public class TestMatrix {
 		}
 	}
 
-	protected Position positionAfter(int rows, int columns, Position pos) {
+	private Position positionAfter(int rows, int columns, Position pos) {
 		if (pos.column + 1 >= columns) {
 			return new Matrix.Position(pos.row + 1, 0);
 		} else {

@@ -1,7 +1,6 @@
 package com.gmail.leonidandand.puzzlesstudy.utils;
 
 public class Dimension {
-
 	public final int rows;
 	public final int columns;
 
