@@ -54,6 +54,8 @@
         android:text="@string/new_game"
         android:textColor="@color/menu_text_color"
         android:textAppearance="?android:attr/textAppearanceLarge"
+        android:typeface="serif"
+        android:textStyle="bold"
         android:textSize="25sp" />
 
     <TextView
@@ -66,6 +68,8 @@
         android:text="@string/load_game"
         android:textColor="@color/menu_text_color"
         android:textAppearance="?android:attr/textAppearanceLarge"
+        android:typeface="serif"
+        android:textStyle="bold"
         android:textSize="25sp" />
 
     <TextView
@@ -78,6 +82,8 @@
         android:text="@string/rating"
         android:textColor="@color/menu_text_color"
         android:textAppearance="?android:attr/textAppearanceLarge"
+        android:typeface="serif"
+        android:textStyle="bold"
         android:textSize="25sp" />
 
     <TextView
@@ -90,6 +96,8 @@
         android:text="@string/paid_features"
         android:textColor="@color/menu_text_color"
         android:textAppearance="?android:attr/textAppearanceLarge"
+        android:typeface="serif"
+        android:textStyle="bold"
         android:textSize="25sp" />
 
 </RelativeLayout>
