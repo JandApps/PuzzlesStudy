@@ -6,6 +6,7 @@ import java.util.Collection;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.LightingColorFilter;
 import android.graphics.Paint;
@@ -20,38 +21,58 @@ import com.gmail.leonidandand.puzzlesstudy.utils.Matrix.Position;
 import com.gmail.leonidandand.puzzlesstudy.utils.Size;
 
 public class PuzzlesView extends View {
-	private final int LATTICE_WIDTH = ResourceReader.integerById(R.integer.lattice_width);
-	private final float ALLOWABLE_ERROR = allowableError();
 	
-	private float allowableError() {
-		return ResourceReader.integerById(R.integer.allowable_error) / 100f;
-	}
+	private static final int LATTICE_COLOR = Color.LTGRAY;
+
+	private static final int COMMUTABLE_COLOR = Color.argb(140, 50, 200, 120);
+
+	private final float ALLOWABLE_ERROR = 0.4f;
+	
+	private final int LATTICE_WIDTH = 2;
+
+	private Bitmap fullImage;
+	
+	private Canvas canvas;
+	
+	private Collection<OnPuzzleAssembledListener> onPuzzleAssembledListeners;
 	
 	private Dimension dim;
-	private Bitmap fullImage;
+	
 	private Matrix<Bitmap> puzzles;
-	private Mixer mixer = new Mixer();
-	private Collection<OnPuzzleAssembledListener> onPuzzleAssembledListeners =
-								new ArrayList<OnPuzzleAssembledListener>();
-	private Arbitrator arbitrator;
-	private Size puzzleSize;
-	private Point lastTouchedPoint;
-	private Point draggedLeftUpper;
+	
 	private Matrix.Position draggedPosition;
+	
 	private Matrix.Position nearestPosition;
-	private Canvas canvas;
+	
+	private Mixer mixer;
+	
+	private Point lastTouchedPoint;
+	
+	private Point draggedLeftUpper;
+	
+	private PuzzlesChecker puzzlesChecker;
+	
+	private Size puzzleSize;
 
 	
 	public PuzzlesView(Context context) {
 		super(context);
+		init();
+	}
+	
+	private void init() {
+		mixer = new Mixer();
+		onPuzzleAssembledListeners = new ArrayList<OnPuzzleAssembledListener>();
 	}
 
 	public PuzzlesView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		init();
 	}
 
 	public PuzzlesView(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
+		init();
 	}
 	
 	public void addOnPuzzleAssembledListener(OnPuzzleAssembledListener listener) {
@@ -93,7 +114,7 @@ public class PuzzlesView extends View {
 		calculatePuzzleSize();
 		fullImage = scaledToFullSize(bitmap);
 		cutIntoPuzzles();
-		arbitrator = new Arbitrator(puzzles);
+		puzzlesChecker = new PuzzlesChecker(puzzles);
 		mix();
 	}
 
@@ -162,7 +183,7 @@ public class PuzzlesView extends View {
 
 	private Paint preparePaintForLattice() {
 		Paint paint = new Paint();
-		paint.setColor(ResourceReader.colorById(R.color.lattice_color));
+		paint.setColor(LATTICE_COLOR);
 		paint.setStrokeWidth(LATTICE_WIDTH);
 		return paint;
 	}
@@ -236,8 +257,7 @@ public class PuzzlesView extends View {
 
 	private Paint commutablePuzzlePaint() {
 		Paint paint = new Paint();
-		int color = ResourceReader.colorById(R.color.commutable_puzzle_color);
-		ColorFilter filter = new LightingColorFilter(color, 1);
+		ColorFilter filter = new LightingColorFilter(COMMUTABLE_COLOR, 1);
 		paint.setColorFilter(filter);
 		return paint;
 	}
@@ -348,7 +368,7 @@ public class PuzzlesView extends View {
 		nearestPosition = null;
 		draggingStopped();
 		invalidate();
-		if (arbitrator.puzzleAssembled(puzzles)) {
+		if (puzzlesChecker.puzzleAssembled(puzzles)) {
 			notifyThatPuzzleAssembled();
 		}
 	}

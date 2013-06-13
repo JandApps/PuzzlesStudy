@@ -2,5 +2,7 @@
 <resources>
     <color name="lattice_color">#ffcccccc</color>
     <color name="commutable_puzzle_color">#4fb8ea8b</color>
+    <color name="menu_background_color">#eeeeee</color>
+    <color name="menu_text_color">#0f0f0f</color>
     
 </resources>

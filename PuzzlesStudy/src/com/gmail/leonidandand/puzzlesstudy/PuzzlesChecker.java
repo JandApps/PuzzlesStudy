@@ -4,10 +4,10 @@ import android.graphics.Bitmap;
 
 import com.gmail.leonidandand.puzzlesstudy.utils.Matrix;
 
-public class Arbitrator {
+public class PuzzlesChecker {
 	private Matrix<Bitmap> startPuzzles;
 
-	public Arbitrator(Matrix<Bitmap> puzzles) {
+	public PuzzlesChecker(Matrix<Bitmap> puzzles) {
 		startPuzzles = new Matrix<Bitmap>(puzzles);
 	}
 

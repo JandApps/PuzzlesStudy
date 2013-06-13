@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <string name="app_name">PuzzlesStudy</string>
-    <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="title_activity_viewer">ViewerActivity</string>
-    <string name="title_activity_puzzles">PuzzlesActivity</string>
-
+    <string name="app_name">Puzzles</string>
+    <string name="new_game">New game</string>
+    <string name="load_game">Continue</string>
+    <string name="rating">Rating</string>
+    <string name="paid_features">Paid features</string>
+    <string name="difficult_easy">Easy</string>
+    <string name="difficult_medium">Medium</string>
+    <string name="difficult_hard">Hard</string>
+    <string name="difficult_title">Difficulty:</string>
+    <string name="gallery">Gallery</string>
 </resources>

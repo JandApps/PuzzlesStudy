@@ -7,7 +7,4 @@
     <integer name="hard_rows">9</integer>
     <integer name="hard_columns">6</integer>
     
-    <integer name="lattice_width">2</integer>
-    <integer name="allowable_error">40</integer>
-    
 </resources>

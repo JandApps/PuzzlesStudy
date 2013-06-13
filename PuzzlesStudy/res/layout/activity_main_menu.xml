@@ -1,0 +1,95 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout"
+	android:background="@color/menu_background_color"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivityRefactoring" >
+
+    <ImageView
+        android:id="@+id/ivPlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="30dp"
+        android:src="@drawable/play" />
+
+    <ImageView
+        android:id="@+id/ivLoad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/ivPlay"
+        android:layout_below="@+id/ivPlay"
+        android:layout_marginTop="30dp"
+        android:src="@drawable/load" />
+
+    <ImageView
+        android:id="@+id/ivRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/ivLoad"
+        android:layout_below="@+id/ivLoad"
+        android:layout_marginTop="30dp"
+        android:src="@drawable/rating" />
+
+    <ImageView
+        android:id="@+id/ivPaid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/ivRating"
+        android:layout_below="@+id/ivRating"
+        android:layout_marginTop="30dp"
+        android:src="@drawable/dollar" />
+
+    <TextView
+        android:id="@+id/tvPlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/ivPlay"
+        android:layout_marginLeft="32dp"
+        android:layout_marginTop="15dp"
+        android:layout_toRightOf="@+id/ivPlay"
+        android:text="@string/new_game"
+        android:textColor="@color/menu_text_color"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="25sp" />
+
+    <TextView
+        android:id="@+id/tvLoad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/ivLoad"
+        android:layout_alignLeft="@+id/tvPlay"
+        android:layout_marginBottom="20dp"
+        android:text="@string/load_game"
+        android:textColor="@color/menu_text_color"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="25sp" />
+
+    <TextView
+        android:id="@+id/tvRating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tvLoad"
+        android:layout_alignTop="@+id/ivRating"
+        android:layout_marginTop="20dp"
+        android:text="@string/rating"
+        android:textColor="@color/menu_text_color"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="25sp" />
+
+    <TextView
+        android:id="@+id/tvPaid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tvRating"
+        android:layout_alignTop="@+id/ivPaid"
+        android:layout_marginTop="20dp"
+        android:text="@string/paid_features"
+        android:textColor="@color/menu_text_color"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="25sp" />
+
+</RelativeLayout>
